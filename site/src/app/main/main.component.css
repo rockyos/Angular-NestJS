@@ -1,0 +1,12 @@
+.table {
+    border: 0;
+    background-color:transparent;
+}
+
+.table td{
+    vertical-align: middle;
+}
+
+.img-thumbnail{
+    min-width: 200px;
+}

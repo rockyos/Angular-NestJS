@@ -1,0 +1,22 @@
+<h2>Forgot your password?</h2>
+<h4>Enter your email.</h4>
+<hr />
+<div class="col-md-5">
+  <form [formGroup]="forgotPassForm" novalidate
+    (ngSubmit)="forgotPassSend(forgotPassForm.controls['forgotEmail'].value)">
+    <div class="form-group">
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{errorMessage}}
+      </div>
+      <label>Email</label>
+      <input class="form-control" name="email" formControlName="forgotEmail" />
+      <div class="alert alert-danger"
+        *ngIf="forgotPassForm.controls['forgotEmail'].invalid && forgotPassForm.controls['forgotEmail'].touched">
+        Wrong format!
+      </div>
+    </div>
+    <div class="form-group">
+      <button [disabled]="forgotPassForm.invalid" class="btn btn-outline-dark font-weight-bold">Send</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,47 @@
+<h2>Log In</h2>
+<h4>Use a local account to log in.</h4>
+<hr />
+<div class="col-md-5">
+  <form [formGroup]="loginForm" novalidate
+    (ngSubmit)="loginSend(loginForm.controls['userEmail'].value, loginForm.controls['userPassword'].value)">
+    <div class="form-group">
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{errorMessage}}
+      </div>
+      <label>Email</label>
+      <input class="form-control" name="email" formControlName="userEmail" />
+      <div class="alert alert-danger"
+        *ngIf="loginForm.controls['userEmail'].invalid && loginForm.controls['userEmail'].touched">
+        Wrong format!
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input class="form-control" type="password" name="password" formControlName="userPassword" />
+      <div class="alert alert-danger"
+        *ngIf="loginForm.controls['userPassword'].invalid && loginForm.controls['userPassword'].touched">
+        Password field must not be empty!
+      </div>
+    </div>
+    <div class="form-group">
+      <input type="checkbox" formControlName="userCheckbox"> &nbsp; Remember Me
+    </div>
+    <div class="form-group">
+      <button [disabled]="loginForm.invalid" class="btn btn-outline-dark font-weight-bold">Enter</button>
+    </div>
+    <div class="form-group">
+      <p>
+        <a href="{{clientUrl}}Account/ForgotPassword">Forgot your password?</a>
+      </p>
+      <p>
+        <a href="{{clientUrl}}Account/Register">Register as a new user</a>
+      </p>
+    </div>
+  </form>
+</div>
+<hr />
+<div class="col-md-5">
+  <h4>Use social account to log in.</h4>
+  <button class="btn" (click)="googleBtn()"><img src="../assets/images/google_btn.jpg" alt="google"></button>
+  <button class="btn" (click)="facebookBtn()"><img src="../assets/images/facebook_btn.jpg" alt="facebook"></button>
+</div>

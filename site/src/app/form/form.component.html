@@ -1,0 +1,19 @@
+<form id="post_file_form" enctype="multipart/form-data" method="post">
+  <div class="d-flex justify-content-center">
+      <div class="btn sendbtn btn-outline-info">
+          <span class="font-weight-bold">Select image</span>
+          <input  type="file" accept="image/*" name="FormFile" (change)="addPhoto($event)" />
+          <span class="text-danger font-weight-bold"></span>
+      </div>
+  </div>
+  <hr />
+  <div class="d-flex justify-content-end">
+      <div class="btn-group" role="group">
+          <span id="btn_reset" class="btn btn-outline-dark font-weight-bold" (click)="resetBtn()">Cancel</span>
+          <span id="save_button" class="btn btn-outline-success font-weight-bold" (click)="saveBtn()">
+              Save
+              <img id="loaderimg" *ngIf="hiddenIcon" src="../assets/images/loaderimg.gif" />
+          </span>
+      </div>
+  </div>
+</form>

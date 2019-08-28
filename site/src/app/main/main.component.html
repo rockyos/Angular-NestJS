@@ -1,0 +1,18 @@
+<div class="d-flex justify-content-end">
+    <div class="d-flex align-items-center">
+        <span>Hello, <u>{{username}}!</u></span> &nbsp;
+        <button (click)="btnLogOut()" class="btn btn-link">Logout</button>
+    </div>
+</div>
+<table class="table table-borderless">
+    <div *ngIf="!photos">No Photos</div>
+    <tr *ngFor="let item of photos">
+        <td>
+            <a data-fancybox="gallery" [href]="url + '/' + item.guid | image | async | safe">
+                <img class="img-thumbnail mx-auto d-block" [src]="url + '/' + item.guid +'?width=320' | image | async | safe" alt="Foto" />
+            </a>
+        </td>
+        <td>{{item.photoName}}</td>
+        <td><button class="btn btn-outline-danger font-weight-bold" (click)="deleteBtn(item)">Delete</button></td>
+    </tr>
+</table>

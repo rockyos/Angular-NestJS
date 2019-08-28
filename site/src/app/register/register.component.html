@@ -1,0 +1,42 @@
+<h2>Register</h2>
+<h4>Create a new account.</h4>
+<hr />
+<div class="col-md-5">
+  <form [formGroup]="registerForm" novalidate (ngSubmit)="registerSend(registerForm.controls['registerEmail'].value, registerForm.controls['registerPass'].value)">
+    <div class="form-group">
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{errorMessage}}
+      </div>
+      <label>Email</label>
+      <input class="form-control" name="email" formControlName="registerEmail" />
+      <div class="alert alert-danger"
+        *ngIf="registerForm.controls['registerEmail'].invalid && registerForm.controls['registerEmail'].touched">
+        Wrong format!
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input class="form-control" type="password" name="password" formControlName="registerPass" />
+      <div class="alert alert-danger"
+        *ngIf="registerForm.controls['registerPass'].invalid && registerForm.controls['registerPass'].touched">
+        Password field must not be empty!
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input class="form-control" type="password" name="password" formControlName="registerPassConfirm" />
+      <!-- <div class="alert alert-danger"
+        *ngIf="registerForm.get('registerPassConfirm')?.errors?.required && registerForm.controls['registerPassConfirm'].touched">
+        Password field must not be empty!
+      </div> -->
+      <div class="alert alert-danger"
+        *ngIf="registerForm.get('registerPassConfirm')?.errors?.notEquivalent">
+        Confirm password did not match!
+      </div>
+    </div>
+    <div class="form-group">
+      <button [disabled]="registerForm.invalid" class="btn btn-outline-dark font-weight-bold">Register</button>
+    </div>
+
+  </form>
+</div>
