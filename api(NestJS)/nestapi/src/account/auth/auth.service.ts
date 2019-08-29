@@ -25,9 +25,7 @@ export class AuthService {
             if (userData.password !== user.password) {
                 return res.status(401).send('Invalid password attempt!');
             }
-            const payload = { sub: user.email };
-            const accessToken = this.jwtService.sign(payload);
-            return res.status(200).send({ access_token: accessToken });
+            this.sendToken(res, user);
         });
     }
 
@@ -36,34 +34,14 @@ export class AuthService {
             if (userData) {
                 return res.status(401).send('Account already exist!');
             }
-            this.userService.create(user);
-            const payload = { sub: user.email };
-            const accessToken = this.jwtService.sign(payload);
-            return res.status(200).send({ access_token: accessToken });
+            let newUser = new User();
+            newUser.email = user.email;
+            newUser.password = user.password;
+            this.userService.create(newUser);
+            this.sendToken(res, newUser);
         });
     }
 
-    // public async googleTokenAuth(res: Response, token: string): Promise<any> {
-    //     let email: string;
-    //     this.httpService.get(`https://www.googleapis.com/plus/v1/people/me?access_token=${token}`).subscribe(resualt => {
-    //         email = resualt['data']['emails'][0]['value'], console.log("Get: ", email)
-    //     });
-
-    //     console.log("In next:", email);
-    //     if (email == null) {
-    //         return res.status(500).send('Error loading external login information!');
-    //     }
-    //     return this.userService.findByEmail(email).then((userData) => {
-    //         if (!userData) {
-    //             userData.email = email;
-    //             userData.password = this.generatePassword();
-    //             this.userService.create(userData);
-    //         }
-    //         const payload = { sub: userData.email };
-    //         const accessToken = this.jwtService.sign(payload);
-    //         return res.status(200).send({ access_token: accessToken });
-    //     });
-    // }
 
     public async googleTokenAuth(res: Response, token: string): Promise<any> {
         let email: string;
@@ -85,14 +63,21 @@ export class AuthService {
         }
         return this.userService.findByEmail(email).then((userData) => {
             if (!userData) {
-                userData.email = email;
-                userData.password = this.generatePassword();
-                this.userService.create(userData);
-            }
-            const payload = { sub: userData.email };
-            const accessToken = this.jwtService.sign(payload);
-            return res.status(200).send({ access_token: accessToken });
+                let newUser = new User();
+                newUser.email = email;
+                newUser.password = this.generatePassword();
+                this.userService.create(newUser);
+                this.sendToken(res, newUser);
+            } else {
+                this.sendToken(res, userData);
+            }  
         });
+    }
+
+    private sendToken(res: Response, user: User){
+        const payload = { sub: user.email };
+        const accessToken = this.jwtService.sign(payload);
+        return res.status(200).send({ access_token: accessToken });
     }
 
     private generatePassword() {
