@@ -10,22 +10,23 @@ export class AccountController {
 
     @Post('Register')
     async register(@Res() res: Response, @Body() user: User): Promise<any> {
-        return this.authService.register(res, user);
+        return this.authService.register(user);
     }
 
     @Post('Login')
     async login(@Res() res: Response, @Body() user: User): Promise<any> {
-        return this.authService.login(res, user);
+        return this.authService.login(user);
     }
 
     @Get('GoogleGetInfoByToken')
-    async googleGetInfoByToken(@Res() res: Response, @Query('token') token): Promise<any>{
-       return this.authService.googleTokenAuth(res, token);
+    async googleGetInfoByToken(@Query('token') token): Promise<any> {
+        const googleToken = await this.authService.googleTokenAuth(token);
+        return googleToken;
     }
 
     @Get('FacebookGetInfoByToken')
-    async facebookGetInfoByToken(@Res() res: Response, @Query('token') token): Promise<any>{
-       return this.authService.facebookTokenAuth(res, token);
+    async facebookGetInfoByToken(@Res() res: Response, @Query('token') token): Promise<any> {
+        return this.authService.facebookTokenAuth(res, token);
     }
 
 }

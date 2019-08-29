@@ -1,9 +1,11 @@
 import { Injectable, HttpService } from '@nestjs/common';
+import { HttpException, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '../user.entity';
 import { Response } from 'express';
 import { strict } from 'assert';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class AuthService {
@@ -17,67 +19,68 @@ export class AuthService {
         return await this.userService.findByEmail(userData.email);
     }
 
-    public async login(res: Response, user: User): Promise<any> {
+    public async login(user: User): Promise<any> {
         return this.validate(user).then((userData) => {
             if (!userData) {
-                return res.status(401).send('Invalid login attempt!');
+                throw new UnauthorizedException('Invalid login attempt!')
             }
             if (userData.password !== user.password) {
-                return res.status(401).send('Invalid password attempt!');
+                throw new UnauthorizedException('Invalid password attempt!');
             }
-            this.sendToken(res, user);
+            return this.getAuthToken(user);
         });
     }
 
-    public async register(res: Response, user: User): Promise<any> {
+    public async register(user: User): Promise<any> {
         return this.validate(user).then((userData) => {
             if (userData) {
-                return res.status(401).send('Account already exist!');
+                throw new UnauthorizedException('Invalid login attempt!')
             }
             let newUser = new User();
             newUser.email = user.email;
             newUser.password = user.password;
             this.userService.create(newUser);
-            this.sendToken(res, newUser);
+            return this.getAuthToken(newUser);
         });
     }
 
 
-    public async googleTokenAuth(res: Response, token: string): Promise<any> {
-        let email: string;
-        this.httpService.get(`https://www.googleapis.com/plus/v1/people/me?access_token=${token}`).subscribe(resualt => {
-            email = resualt['data']['emails'][0]['value'], this.socialLoginRegistration(res, email)
-        });
+    public async googleTokenAuth(token: string): Promise<any> {
+        const actionUrl = `https://www.googleapis.com/plus/v1/people/me?access_token=${token}`;
+        const email = await this.httpService
+            .get(actionUrl)
+            .pipe(map(async (response: any) => {
+                return response.data['emails'][0]['value'];
+            })).toPromise();
+        const result = await this.socialLoginRegistration(email)
+        return result;
     }
 
     public async facebookTokenAuth(res: Response, token: string): Promise<any> {
         let email: string;
-        this.httpService.get(`https://graph.facebook.com/v2.8/me?fields=email&access_token=${token}`).subscribe(resualt => {
-            email = resualt['data']['email'], this.socialLoginRegistration(res, email)
+        this.httpService.get(`https://graph.facebook.com/v2.8/me?fields=email&access_token=${token}`).subscribe(result => {
+            email = result['data']['email'], this.socialLoginRegistration(email)
         });
     }
 
-    private socialLoginRegistration(res: Response, email: string) {
+    private async socialLoginRegistration(email: string) {
         if (email == null) {
-            return res.status(500).send('Error loading external login information!');
+            throw new InternalServerErrorException('Error loading external login information!');
         }
-        return this.userService.findByEmail(email).then((userData) => {
-            if (!userData) {
-                let newUser = new User();
-                newUser.email = email;
-                newUser.password = this.generatePassword();
-                this.userService.create(newUser);
-                this.sendToken(res, newUser);
-            } else {
-                this.sendToken(res, userData);
-            }  
-        });
+        let user = await this.userService.findByEmail(email);
+        if (!user) {
+            user = new User();
+            user.email = email;
+            user.password = this.generatePassword();
+            this.userService.create(user);
+        }
+        return this.getAuthToken(user);
     }
 
-    private sendToken(res: Response, user: User){
+    private getAuthToken(user: User) {
         const payload = { sub: user.email };
         const accessToken = this.jwtService.sign(payload);
-        return res.status(200).send({ access_token: accessToken });
+        return { access_token: accessToken };
     }
 
     private generatePassword() {
