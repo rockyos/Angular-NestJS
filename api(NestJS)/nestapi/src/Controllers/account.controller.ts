@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Res, Get, Query } from '@nestjs/common';
-import { User } from './user.entity';
-import { AuthService } from './auth/auth.service';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { AuthService } from '../Services/auth.service';
+import { UserDto } from 'src/Models/DTO/userDto';
 
 
 @Controller('Account')
@@ -8,13 +8,13 @@ export class AccountController {
     constructor(private readonly authService: AuthService) { }
 
     @Post('Register')
-    async register(@Body() user: User): Promise<any> {
-        return await this.authService.register(user);
+    async register(@Body() userDto: UserDto): Promise<any> {
+        return await this.authService.register(userDto);
     }
 
     @Post('Login')
-    async login(@Body() user: User): Promise<any> {
-        return await this.authService.login(user);
+    async login(@Body() userDto: UserDto): Promise<any> {
+        return await this.authService.login(userDto);
     }
 
     @Get('GoogleGetInfoByToken')

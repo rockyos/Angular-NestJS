@@ -1,10 +1,11 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import { User } from '../user.entity';
+import { UserService } from './user.service';
+import { User } from '../Models/Entity/user.entity';
 import * as crypto from 'crypto';
 import { map } from 'rxjs/operators';
+import { UserDto } from 'src/Models/DTO/userDto';
 
 @Injectable()
 export class AuthService {
@@ -19,30 +20,30 @@ export class AuthService {
         return crypto.createHmac('sha256', pass).digest('hex');
     }
 
-    private async validate(userData: User): Promise<User> {
+    private async validate(userData: UserDto): Promise<User> {
         return await this.userService.findByEmail(userData.email);
     }
 
-    public async login(user: User): Promise<any> {
-        return await this.validate(user).then((userData) => {
+    public async login(userDto: UserDto): Promise<any> {
+        return await this.validate(userDto).then((userData) => {
             if (!userData) {
                 throw new UnauthorizedException('Invalid login attempt!')
             }
-            if (userData.password !== this.hashPassword(user.password)) {
+            if (userData.password !== this.hashPassword(userDto.password)) {
                 throw new UnauthorizedException('Invalid password attempt!');
             }
-            return this.getAuthToken(user);
+            return this.getAuthToken(userDto);
         });
     }
 
-    public async register(user: User): Promise<any> {
-        return await this.validate(user).then(async(userData) => {
+    public async register(userDto: UserDto): Promise<any> {
+        return await this.validate(userDto).then(async(userData) => {
             if (userData) {
                 throw new UnauthorizedException('Invalid login attempt!')
             }
             let newUser = new User();
-            newUser.email = user.email;
-            newUser.password = user.password;
+            newUser.email = userDto.email;
+            newUser.password = userDto.password;
             let newUserAdded = await this.userService.create(newUser);
             if(newUserAdded){
                 return this.getAuthToken(newUser);
@@ -95,8 +96,8 @@ export class AuthService {
         return this.getAuthToken(user);
     }
 
-    private getAuthToken(user: User) {
-        const payload = { sub: user.email };
+    private getAuthToken(userDto: UserDto) {
+        const payload = { sub: userDto.email };
         const accessToken = this.jwtService.sign(payload);
         return { access_token: accessToken };
     }

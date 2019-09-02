@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AccountModule } from './account/account.module';
+import { AccountModule } from './Modules/account.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -15,11 +13,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         password: 'superuser',
         database: 'postgres',
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        migrations:['migration/*.ts'],
+        migrations:[__dirname + '/../migrations/*{.ts,.js}'],
+        migrationsTableName: 'migrations_typeorm',
+        migrationsRun: true,
         synchronize: true,
       }
     )],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule { }
