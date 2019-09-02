@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Res, Get, Query } from '@nestjs/common';
 import { User } from './user.entity';
 import { AuthService } from './auth/auth.service';
-import { Response } from 'express';
 
 
 @Controller('Account')
@@ -9,13 +8,13 @@ export class AccountController {
     constructor(private readonly authService: AuthService) { }
 
     @Post('Register')
-    async register(@Res() res: Response, @Body() user: User): Promise<any> {
-        return this.authService.register(user);
+    async register(@Body() user: User): Promise<any> {
+        return await this.authService.register(user);
     }
 
     @Post('Login')
-    async login(@Res() res: Response, @Body() user: User): Promise<any> {
-        return this.authService.login(user);
+    async login(@Body() user: User): Promise<any> {
+        return await this.authService.login(user);
     }
 
     @Get('GoogleGetInfoByToken')
@@ -25,8 +24,9 @@ export class AccountController {
     }
 
     @Get('FacebookGetInfoByToken')
-    async facebookGetInfoByToken(@Res() res: Response, @Query('token') token): Promise<any> {
-        return this.authService.facebookTokenAuth(res, token);
+    async facebookGetInfoByToken(@Query('token') token): Promise<any> {
+        const facebookToken = await this.authService.facebookTokenAuth(token);
+        return facebookToken;
     }
 
 }

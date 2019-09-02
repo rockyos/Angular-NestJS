@@ -1,10 +1,9 @@
 import { Injectable, HttpService } from '@nestjs/common';
-import { HttpException, NotFoundException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '../user.entity';
-import { Response } from 'express';
-import { strict } from 'assert';
+
 import { map } from 'rxjs/operators';
 
 @Injectable()
@@ -20,7 +19,7 @@ export class AuthService {
     }
 
     public async login(user: User): Promise<any> {
-        return this.validate(user).then((userData) => {
+        return await this.validate(user).then((userData) => {
             if (!userData) {
                 throw new UnauthorizedException('Invalid login attempt!')
             }
@@ -32,7 +31,7 @@ export class AuthService {
     }
 
     public async register(user: User): Promise<any> {
-        return this.validate(user).then((userData) => {
+        return await this.validate(user).then((userData) => {
             if (userData) {
                 throw new UnauthorizedException('Invalid login attempt!')
             }
@@ -56,11 +55,15 @@ export class AuthService {
         return result;
     }
 
-    public async facebookTokenAuth(res: Response, token: string): Promise<any> {
-        let email: string;
-        this.httpService.get(`https://graph.facebook.com/v2.8/me?fields=email&access_token=${token}`).subscribe(result => {
-            email = result['data']['email'], this.socialLoginRegistration(email)
-        });
+    public async facebookTokenAuth(token: string): Promise<any> {
+        const actionUrl = `https://graph.facebook.com/v2.8/me?fields=email&access_token=${token}`;
+        const email = await this.httpService
+            .get(actionUrl)
+            .pipe(map(async (response: any) => {
+                return response.data['email'];
+            })).toPromise();
+        const result = await this.socialLoginRegistration(email)
+        return result;
     }
 
     private async socialLoginRegistration(email: string) {
