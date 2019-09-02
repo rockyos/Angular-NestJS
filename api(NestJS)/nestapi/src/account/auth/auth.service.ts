@@ -3,7 +3,7 @@ import { InternalServerErrorException, UnauthorizedException } from '@nestjs/com
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '../user.entity';
-
+import * as crypto from 'crypto';
 import { map } from 'rxjs/operators';
 
 @Injectable()
@@ -14,6 +14,11 @@ export class AuthService {
         private readonly httpService: HttpService
     ) { }
 
+
+    private hashPassword(pass: string) {
+        return crypto.createHmac('sha256', pass).digest('hex');
+    }
+
     private async validate(userData: User): Promise<User> {
         return await this.userService.findByEmail(userData.email);
     }
@@ -23,7 +28,7 @@ export class AuthService {
             if (!userData) {
                 throw new UnauthorizedException('Invalid login attempt!')
             }
-            if (userData.password !== user.password) {
+            if (userData.password !== this.hashPassword(user.password)) {
                 throw new UnauthorizedException('Invalid password attempt!');
             }
             return this.getAuthToken(user);
@@ -31,15 +36,20 @@ export class AuthService {
     }
 
     public async register(user: User): Promise<any> {
-        return await this.validate(user).then((userData) => {
+        return await this.validate(user).then(async(userData) => {
             if (userData) {
                 throw new UnauthorizedException('Invalid login attempt!')
             }
             let newUser = new User();
             newUser.email = user.email;
             newUser.password = user.password;
-            this.userService.create(newUser);
-            return this.getAuthToken(newUser);
+            let newUserAdded = await this.userService.create(newUser);
+            if(newUserAdded){
+                return this.getAuthToken(newUser);
+            } else {
+                throw new UnauthorizedException('Error write to DataBase')
+            }
+         
         });
     }
 
@@ -75,7 +85,12 @@ export class AuthService {
             user = new User();
             user.email = email;
             user.password = this.generatePassword();
-            this.userService.create(user);
+            let newUser = await this.userService.create(user);
+            if (newUser) {
+                return this.getAuthToken(newUser);
+            } else {
+                return new InternalServerErrorException('Error write to DataBase');
+            }
         }
         return this.getAuthToken(user);
     }
