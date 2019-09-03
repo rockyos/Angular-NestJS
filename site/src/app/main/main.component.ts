@@ -19,7 +19,7 @@ export class MainComponent implements OnInit {
   ngOnInit() {
     this.getData();
     var decoded = this.token.getDecodJWT();
-    this.username = decoded['sub'];
+    this.username = decoded['username'];
   }
 
   getData() {
