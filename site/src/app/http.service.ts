@@ -21,7 +21,7 @@ export class HttpService {
 
   public addPhoto(newImage: File): Observable<string> {
     const formData = new FormData();
-    formData.append('newImage', newImage, newImage.name);
+    formData.append('file', newImage, newImage.name);
     const url = `${environment.apiUrl}api/photo/send`;
     return this.http.post<string>(url, formData);
   }
