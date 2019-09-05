@@ -13,7 +13,13 @@ export class MainPhotoService {
 
 
     public async getPhotoAll(): Promise<PhotoDto[]> {
-        return await this.photoService.findAll();
+        const photo = await this.photoService.findAll();
+        let photoDto : PhotoDto[] = [];
+        photo.forEach(element => {
+            var newPhotoDto = new PhotoDto(element.id, element.guid, element.originalname);
+            photoDto.push(newPhotoDto);
+        });
+        return photoDto;
     }
 
     public async getImage(photoName: string): Promise<any> {

@@ -1,11 +1,11 @@
 export class Photo {
     id: number;
     guid: string;
-    photoName: string;
+    originalname: string;
 
-    constructor(id: number, guid: string, photoName: string) {
+    constructor(id: number, guid: string, originalname: string) {
         this.id = id;
         this.guid = guid;
-        this.photoName = photoName;
+        this.originalname = originalname;
     }
 }

@@ -12,7 +12,7 @@
                 <img class="img-thumbnail mx-auto d-block" [src]="url + '/' + item.guid +'?width=320' | image | async | safe" alt="Foto" />
             </a>
         </td>
-        <td>{{item.photoName}}</td>
+        <td>{{item.originalname}}</td>
         <td><button class="btn btn-outline-danger font-weight-bold" (click)="deleteBtn(item)">Delete</button></td>
     </tr>
 </table>

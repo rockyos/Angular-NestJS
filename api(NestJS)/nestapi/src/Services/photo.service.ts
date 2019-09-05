@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Photo } from 'src/Models/Entity/photo.entity';
 import { Repository } from 'typeorm';
+import { PhotoDto } from 'src/Models/DTO/photoDto';
 
 @Injectable()
 export class PhotoService {

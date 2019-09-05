@@ -12,7 +12,9 @@ export class PhotoController {
      @UseGuards(AuthGuard('jwt'))
      @Get()
      async getPhotoAsync(): Promise<PhotoDto[]> {
-          return await this.mainPhotoService.getPhotoAll();
+          const array = await this.mainPhotoService.getPhotoAll();
+          console.log(array);
+          return array;
      }
 
      @UseGuards(AuthGuard('jwt'))
