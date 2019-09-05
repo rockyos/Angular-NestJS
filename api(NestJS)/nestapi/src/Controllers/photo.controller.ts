@@ -12,15 +12,14 @@ export class PhotoController {
      @UseGuards(AuthGuard('jwt'))
      @Get()
      async getPhotoAsync(): Promise<PhotoDto[]> {
-          const array = await this.mainPhotoService.getPhotoAll();
-          console.log(array);
-          return array;
+          return await this.mainPhotoService.getPhotoAll();
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Get(':id')
      async getOnePhotoAsync(@Param('id') id, @Query() query, @Res() res): Promise<any> {
-          const stream = await this.mainPhotoService.getImage(id);
+          const photoWidth = query['width'];
+          const stream = await this.mainPhotoService.getImage(id, photoWidth);
           return stream.pipe(res);
      }
 

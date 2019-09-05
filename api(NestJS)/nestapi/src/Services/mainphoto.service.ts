@@ -4,6 +4,7 @@ import { PhotoDto } from "src/Models/DTO/photoDto";
 import { Photo } from "src/Models/Entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
+const sharp = require("sharp");
 
 @Injectable()
 export class MainPhotoService {
@@ -14,7 +15,7 @@ export class MainPhotoService {
 
     public async getPhotoAll(): Promise<PhotoDto[]> {
         const photo = await this.photoService.findAll();
-        let photoDto : PhotoDto[] = [];
+        let photoDto: PhotoDto[] = [];
         photo.forEach(element => {
             var newPhotoDto = new PhotoDto(element.id, element.guid, element.originalname);
             photoDto.push(newPhotoDto);
@@ -22,7 +23,13 @@ export class MainPhotoService {
         return photoDto;
     }
 
-    public async getImage(photoName: string): Promise<any> {
+    public async getImage(photoName: string, width: string): Promise<any> {
+        if (width) {
+            const photoWidth = Number(width);
+            const data = (await this.photoService.findOneByGuid(photoName)).buffer;
+            const resizedPhoto = await sharp(data).resize(photoWidth).toBuffer();
+            return this.getReadableStream(resizedPhoto);
+        }
         const data = (await this.photoService.findOneByGuid(photoName)).buffer;
         return this.getReadableStream(data);
     }
