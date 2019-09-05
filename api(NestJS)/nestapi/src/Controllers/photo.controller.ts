@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Request, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Param, Query, Res } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { Photo } from 'src/Models/Entity/photo.entity';
@@ -12,15 +12,14 @@ export class PhotoController {
      @UseGuards(AuthGuard('jwt'))
      @Get()
      async getPhotoAsync(): Promise<PhotoDto[]> {
-         return await this.mainPhotoService.getPhotoAll();
+          return await this.mainPhotoService.getPhotoAll();
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Get(':id')
-     async getOnePhotoAsync(@Param('id') id, @Query() query): Promise<any> {
-          console.log(id, '  ', query['width']);
-         //await this.mainPhotoService.getPhotoAll();
-         return 200;
+     async getOnePhotoAsync(@Param('id') id, @Query() query, @Res() res): Promise<any> {
+          const stream = await this.mainPhotoService.getImage(id);
+          return stream.pipe(res);
      }
 
 

@@ -22,10 +22,10 @@ export class PhotoService {
         return await this.photoRepository.save(photo);
     }
 
-    async findOneByGuid(photo: Photo):Promise<Photo>{
+    async findOneByGuid(guid: string):Promise<Photo>{
         return await this.photoRepository.findOne({
             where:{
-                guid: photo.guid,
+                guid: guid,
             }
         });
     }

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from "typeorm";
 
 @Entity()
 export class Photo{
@@ -11,6 +11,10 @@ export class Photo{
     @Column()
     originalname: string;
 
+    // @BeforeInsert()
+    // rewrire(){
+    //     Buffer.from(this.buffer.toString('hex'),'hex');
+    // }
     @Column("bytea")
     buffer: Buffer;
 }
