@@ -4,6 +4,7 @@ import { PhotoDto } from "src/Models/DTO/photoDto";
 import { Photo } from "src/Models/Entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
+import { jwtConstants } from "../constants"
 const sharp = require("sharp");
 
 @Injectable()
@@ -45,11 +46,20 @@ export class MainPhotoService {
     public async saveOne(photo: Photo): Promise<any> {
         photo.guid = Guid.create().toString();
         const newPhoto = await this.photoService.create(photo);
-        console.log(newPhoto);
         if (newPhoto) {
             return 201;
         }
         throw new UnauthorizedException('Invalid login attempt!')
     }
 
+
+    public async saveInSession(photo: Photo, session: Photo[]): Promise<any> {
+        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        photo.guid = Guid.create().toString();
+        if(photoInSession){
+            photoInSession.push(photo);
+        } else {
+            session[jwtConstants.sessionKey] = photo;
+        }
+    }
 }

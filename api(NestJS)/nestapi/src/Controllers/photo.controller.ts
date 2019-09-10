@@ -1,9 +1,10 @@
-import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Param, Query, Res, Session } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { Photo } from 'src/Models/Entity/photo.entity';
 import { PhotoDto } from 'src/Models/DTO/photoDto';
 import { MainPhotoService } from 'src/Services/mainphoto.service';
+import { async } from 'rxjs/internal/scheduler/async';
 
 @Controller('api/photo')
 export class PhotoController {
@@ -23,14 +24,20 @@ export class PhotoController {
           return stream.pipe(res);
      }
 
-
-
      @UseGuards(AuthGuard('jwt'))
      @Post('send')
      @UseInterceptors(FileInterceptor('file'))
-     async uploadPhoto(@UploadedFile() file: Photo): Promise<any> {
-          return await this.mainPhotoService.saveOne(file);
+     async uploadPhoto(@UploadedFile() file: Photo, @Session() session: Photo[]): Promise<any> {
+
+          return await this.mainPhotoService.saveInSession(file, session);
+          //session['photos'] = file;
+
+          //  return await this.mainPhotoService.saveOne(file);
      }
 
-
+     @UseGuards(AuthGuard('jwt'))
+     @Post('save')
+     async savePhoto(@Session() session: Photo[]): Promise<any>{
+          
+     }
 }
