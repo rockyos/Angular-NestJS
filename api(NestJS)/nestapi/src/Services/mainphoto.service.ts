@@ -42,22 +42,22 @@ export class MainPhotoService {
 
     public async getImage(session: Photo[], id: string, width: string): Promise<any> {
         let photoInDb = await this.photoService.findOneByGuid(id);
-        if(!photoInDb){
+        if (!photoInDb) {
             let photoInSession: Photo[] = session[jwtConstants.sessionKey];
-            photoInSession.forEach(photoItem => {
-                if(photoItem.guid === id){
+            for (let photoItem of photoInSession) {
+                if (photoItem.guid === id) {
                     photoInDb = photoItem;
-                    console.log('photoInDb: ', photoInDb);
+                    var arrByte = Buffer.from(photoInDb.buffer);
+                    photoInDb.buffer = arrByte;
+                    break;
                 }
-            });
-            console.log('In session!!!!');
+            }
         }
-        console.log(photoInDb.buffer);
         if (width) {
             const photoWidth = Number(width);
             const resizedPhoto = await sharp(photoInDb.buffer).resize(photoWidth).toBuffer();
             return this.getReadableStream(resizedPhoto);
-        }       
+        }
         return this.getReadableStream(photoInDb.buffer);
     }
 
@@ -69,27 +69,20 @@ export class MainPhotoService {
     }
 
 
-    // public async saveOne(photo: Photo): Promise<any> {
-    //     photo.guid = Guid.create().toString();
-    //     const newPhoto = await this.photoService.create(photo);
-    //     if (newPhoto) {
-    //         return 201;
-    //     }
-    //     throw new UnauthorizedException('Invalid login attempt!')
-    // }
+    private upLoadFileToPhoto(file: Photo) {
+        var guid = Guid.create().toString();
+        return new Photo(guid, file.originalname, file.buffer);
+    }
 
 
     public async addPhotoToSession(photo: Photo, session: Photo[]): Promise<any> {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
-        photo.guid = Guid.create().toString();
         if (photoInSession) {
-            console.log("true");
-            photoInSession.push(photo);
+            photoInSession.push(this.upLoadFileToPhoto(photo));
             session[jwtConstants.sessionKey] = photoInSession;
         } else {
-            console.log("false");
             let photoInSession: Photo[] = [];
-            photoInSession.push(photo);
+            photoInSession.push(this.upLoadFileToPhoto(photo));
             session[jwtConstants.sessionKey] = photoInSession;
         }
     }
@@ -122,5 +115,9 @@ export class MainPhotoService {
                 }
             });
         }
+    }
+
+    public async resetPhoto(session: Photo[]): Promise<any> {
+        session[jwtConstants.sessionKey] = [];
     }
 }

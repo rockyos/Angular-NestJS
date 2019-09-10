@@ -28,8 +28,6 @@ export class PhotoController {
      @UseInterceptors(FileInterceptor('file'))
      async uploadPhoto(@UploadedFile() file: Photo, @Session() session: Photo[]): Promise<any> {
           return await this.mainPhotoService.addPhotoToSession(file, session);
-          //session['photos'] = file;
-          //  return await this.mainPhotoService.saveOne(file);
      }
 
      @UseGuards(AuthGuard('jwt'))
@@ -47,6 +45,6 @@ export class PhotoController {
      @UseGuards(AuthGuard('jwt'))
      @Post('reset')
      async resetPhoto(@Session() session: Photo[]): Promise<any>{
-          session = [];
+          await this.mainPhotoService.resetPhoto(session);
      }
 }
