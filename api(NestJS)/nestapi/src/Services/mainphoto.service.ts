@@ -14,25 +14,51 @@ export class MainPhotoService {
     ) { }
 
 
-    public async getPhotoAll(): Promise<PhotoDto[]> {
-        const photo = await this.photoService.findAll();
+    public async getPhotoAll(session: Photo[]): Promise<PhotoDto[]> {
+        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        let photosInDb = await this.photoService.findAll();
+        if (photoInSession) {
+            let hidePhotoFromSession: Photo[] = [];
+            photoInSession.forEach(async photoItem => {
+                const photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
+                if (photoInDb) {
+                    const index = photosInDb.indexOf(photoInDb);
+                    photosInDb.splice(index);
+                    hidePhotoFromSession.push(photoItem);
+                }
+            });
+            let removeArray: Photo[] = photoInSession.filter((item) => !hidePhotoFromSession.includes(item));
+            removeArray.forEach(photoItem => {
+                photosInDb.push(photoItem);
+            });
+        }
         let photoDto: PhotoDto[] = [];
-        photo.forEach(element => {
+        photosInDb.forEach(element => {
             var newPhotoDto = new PhotoDto(element.id, element.guid, element.originalname);
             photoDto.push(newPhotoDto);
         });
         return photoDto;
     }
 
-    public async getImage(photoName: string, width: string): Promise<any> {
+    public async getImage(session: Photo[], id: string, width: string): Promise<any> {
+        let photoInDb = await this.photoService.findOneByGuid(id);
+        if(!photoInDb){
+            let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+            photoInSession.forEach(photoItem => {
+                if(photoItem.guid === id){
+                    photoInDb = photoItem;
+                    console.log('photoInDb: ', photoInDb);
+                }
+            });
+            console.log('In session!!!!');
+        }
+        console.log(photoInDb.buffer);
         if (width) {
             const photoWidth = Number(width);
-            const data = (await this.photoService.findOneByGuid(photoName)).buffer;
-            const resizedPhoto = await sharp(data).resize(photoWidth).toBuffer();
+            const resizedPhoto = await sharp(photoInDb.buffer).resize(photoWidth).toBuffer();
             return this.getReadableStream(resizedPhoto);
-        }
-        const data = (await this.photoService.findOneByGuid(photoName)).buffer;
-        return this.getReadableStream(data);
+        }       
+        return this.getReadableStream(photoInDb.buffer);
     }
 
     private getReadableStream(buffer: Buffer): Readable {
@@ -43,23 +69,58 @@ export class MainPhotoService {
     }
 
 
-    public async saveOne(photo: Photo): Promise<any> {
-        photo.guid = Guid.create().toString();
-        const newPhoto = await this.photoService.create(photo);
-        if (newPhoto) {
-            return 201;
-        }
-        throw new UnauthorizedException('Invalid login attempt!')
-    }
+    // public async saveOne(photo: Photo): Promise<any> {
+    //     photo.guid = Guid.create().toString();
+    //     const newPhoto = await this.photoService.create(photo);
+    //     if (newPhoto) {
+    //         return 201;
+    //     }
+    //     throw new UnauthorizedException('Invalid login attempt!')
+    // }
 
 
-    public async saveInSession(photo: Photo, session: Photo[]): Promise<any> {
+    public async addPhotoToSession(photo: Photo, session: Photo[]): Promise<any> {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
         photo.guid = Guid.create().toString();
-        if(photoInSession){
+        if (photoInSession) {
+            console.log("true");
             photoInSession.push(photo);
+            session[jwtConstants.sessionKey] = photoInSession;
         } else {
-            session[jwtConstants.sessionKey] = photo;
+            console.log("false");
+            let photoInSession: Photo[] = [];
+            photoInSession.push(photo);
+            session[jwtConstants.sessionKey] = photoInSession;
+        }
+    }
+
+    public async savePhoto(session: Photo[]): Promise<any> {
+        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        if (photoInSession) {
+            photoInSession.forEach(async photoItem => {
+                const photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
+                if (photoInDb) {
+                    await this.photoService.removePhoto(photoInDb);
+                } else {
+                    await this.photoService.addPhoto(photoItem);
+                }
+            });
+            session[jwtConstants.sessionKey] = [];
+        }
+    }
+
+    public async deletePhoto(session: Photo[], id: string): Promise<any> {
+        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        const photoInDb = await this.photoService.findOneByGuid(id);
+        if (photoInDb) {
+            session[jwtConstants.sessionKey].push(photoInDb);
+        } else {
+            photoInSession.forEach(async photoItem => {
+                if (photoItem.guid === id) {
+                    const index = photoInSession.indexOf(photoItem);
+                    session[jwtConstants.sessionKey].splice(index);
+                }
+            });
         }
     }
 }

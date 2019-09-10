@@ -19,7 +19,7 @@ export class PhotoService {
     //     return await this.photoRepository.save(photos);
     // }
 
-    async create(photo: Photo): Promise<Photo>{
+    async addPhoto(photo: Photo): Promise<Photo>{
         return await this.photoRepository.save(photo);
     }
 
@@ -31,4 +31,7 @@ export class PhotoService {
         });
     }
 
+    async removePhoto(photo: Photo): Promise<Photo>{
+        return await this.photoRepository.remove(photo);
+    }
 }
