@@ -34,7 +34,7 @@ export class PhotoController {
      @Post('save')
      async savePhoto(@Session() session: Photo[]): Promise<any> {
           await this.mainPhotoService.savePhoto(session);
-          return await this.mainPhotoService.resetPhoto(session);
+          await this.mainPhotoService.resetPhoto(session);
      }
 
      @UseGuards(AuthGuard('jwt'))

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PhotoService } from "./photo.service";
 import { PhotoDto } from "src/Models/DTO/photoDto";
 import { Photo } from "src/Models/Entity/photo.entity";
@@ -16,15 +16,13 @@ export class MainPhotoService {
 
     public async getPhotoAll(session: Photo[]): Promise<PhotoDto[]> {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
-        console.log("photoInSession: ", photoInSession);
         let photosInDb = await this.photoService.findAll();
-        console.log("photosInDb: ", photosInDb);
         if (photoInSession) {
             let hidePhotoFromSession: Photo[] = [];
             photoInSession.forEach(async photoItem => {
-                const photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
-                if (photoInDb) {
-                    const index = photosInDb.indexOf(photoInDb);
+                const photo = photosInDb.filter((item) => item.guid == photoItem.guid);
+                const index = photosInDb.indexOf(photo[0]);
+                if (index != -1) {
                     photosInDb.splice(index);
                     hidePhotoFromSession.push(photoItem);
                 }
