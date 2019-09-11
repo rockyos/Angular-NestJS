@@ -16,7 +16,9 @@ export class MainPhotoService {
 
     public async getPhotoAll(session: Photo[]): Promise<PhotoDto[]> {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        console.log("photoInSession: ", photoInSession);
         let photosInDb = await this.photoService.findAll();
+        console.log("photosInDb: ", photosInDb);
         if (photoInSession) {
             let hidePhotoFromSession: Photo[] = [];
             photoInSession.forEach(async photoItem => {
@@ -91,14 +93,15 @@ export class MainPhotoService {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
         if (photoInSession) {
             photoInSession.forEach(async photoItem => {
-                const photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
+                let photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
                 if (photoInDb) {
                     await this.photoService.removePhoto(photoInDb);
                 } else {
+                    var array = Buffer.from(photoItem.buffer)
+                    photoItem.buffer = array;
                     await this.photoService.addPhoto(photoItem);
                 }
             });
-            session[jwtConstants.sessionKey] = [];
         }
     }
 
@@ -106,7 +109,12 @@ export class MainPhotoService {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
         const photoInDb = await this.photoService.findOneByGuid(id);
         if (photoInDb) {
-            session[jwtConstants.sessionKey].push(photoInDb);
+            photoInSession = session[jwtConstants.sessionKey];
+            if (!photoInSession) {
+                photoInSession = [];
+            }
+            photoInSession.push(photoInDb);
+            session[jwtConstants.sessionKey] = photoInSession;
         } else {
             photoInSession.forEach(async photoItem => {
                 if (photoItem.guid === id) {
@@ -118,6 +126,6 @@ export class MainPhotoService {
     }
 
     public async resetPhoto(session: Photo[]): Promise<any> {
-        session[jwtConstants.sessionKey] = [];
+        session[jwtConstants.sessionKey] = undefined;
     }
 }

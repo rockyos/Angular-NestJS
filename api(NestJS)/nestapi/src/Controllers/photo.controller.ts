@@ -17,7 +17,7 @@ export class PhotoController {
 
      @UseGuards(AuthGuard('jwt'))
      @Get(':id')
-     async getOnePhotoAsync(@Session() session: Photo[],@Param('id') id, @Query() query, @Res() res): Promise<any> {
+     async getOnePhotoAsync(@Session() session: Photo[], @Param('id') id, @Query() query, @Res() res): Promise<any> {
           const photoWidth = query['width'];
           const stream = await this.mainPhotoService.getImage(session, id, photoWidth);
           return stream.pipe(res);
@@ -32,19 +32,20 @@ export class PhotoController {
 
      @UseGuards(AuthGuard('jwt'))
      @Post('save')
-     async savePhoto(@Session() session: Photo[]): Promise<any>{
-          return await this.mainPhotoService.savePhoto(session);
+     async savePhoto(@Session() session: Photo[]): Promise<any> {
+          await this.mainPhotoService.savePhoto(session);
+          return await this.mainPhotoService.resetPhoto(session);
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Delete(':id')
-     async deletePhoto(@Param('id') id, @Session() session: Photo[]): Promise<any>{
+     async deletePhoto(@Param('id') id, @Session() session: Photo[]): Promise<any> {
           return await this.mainPhotoService.deletePhoto(session, id);
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Post('reset')
-     async resetPhoto(@Session() session: Photo[]): Promise<any>{
+     async resetPhoto(@Session() session: Photo[]): Promise<any> {
           await this.mainPhotoService.resetPhoto(session);
      }
 }
