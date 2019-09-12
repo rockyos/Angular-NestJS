@@ -5,7 +5,7 @@
     </div>
 </div>
 <table class="table table-borderless">
-    <div *ngIf="!photos">No Photos</div>
+    <div class="d-flex justify-content-center" *ngIf="photos.length == 0">No Photos</div>
     <tr *ngFor="let item of photos">
         <td>
             <a data-fancybox="gallery" [href]="url + '/' + item.guid | image | async | safe">

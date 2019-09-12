@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Param, Query, Res, Session, Delete } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Param, Query, Res, Session, Delete, CacheInterceptor } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { Photo } from 'src/Models/Entity/photo.entity';
@@ -6,6 +6,7 @@ import { PhotoDto } from 'src/Models/DTO/photoDto';
 import { MainPhotoService } from 'src/Services/mainphoto.service';
 
 @Controller('api/photo')
+//@UseInterceptors(CacheInterceptor)
 export class PhotoController {
      constructor(private readonly mainPhotoService: MainPhotoService) { }
 
