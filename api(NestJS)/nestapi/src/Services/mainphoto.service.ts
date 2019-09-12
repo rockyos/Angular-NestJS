@@ -13,30 +13,29 @@ export class MainPhotoService {
         private readonly photoService: PhotoService,
     ) { }
 
-
     public async getPhotoAll(session: Photo[]): Promise<PhotoDto[]> {
-        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        let photosInSession: Photo[] = session[jwtConstants.sessionKey];
         let photosInDb = await this.photoService.findAll();
-        if (photoInSession) {
+        if (photosInSession) {
             let hidePhotoFromSession: Photo[] = [];
-            photoInSession.forEach(async photoItem => {
+            for(var photoItem of photosInSession){
                 const photo = photosInDb.filter((item) => item.guid == photoItem.guid);
                 const index = photosInDb.indexOf(photo[0]);
                 if (index != -1) {
                     photosInDb.splice(index);
                     hidePhotoFromSession.push(photoItem);
                 }
-            });
-            let removeArray: Photo[] = photoInSession.filter((item) => !hidePhotoFromSession.includes(item));
+            }
+            let removeArray: Photo[] = photosInSession.filter((item) => !hidePhotoFromSession.includes(item));
             removeArray.forEach(photoItem => {
                 photosInDb.push(photoItem);
             });
         }
         let photoDto: PhotoDto[] = [];
-        photosInDb.forEach(element => {
-            var newPhotoDto = new PhotoDto(element.id, element.guid, element.originalname);
+        for(var photoItem of photosInDb){
+            var newPhotoDto = new PhotoDto(photoItem.id, photoItem.guid, photoItem.originalname);
             photoDto.push(newPhotoDto);
-        });
+        }      
         return photoDto;
     }
 
@@ -44,7 +43,7 @@ export class MainPhotoService {
         let photoInDb = await this.photoService.findOneByGuid(id);
         if (!photoInDb) {
             let photoInSession: Photo[] = session[jwtConstants.sessionKey];
-            for (let photoItem of photoInSession) {
+            for (var photoItem of photoInSession) {
                 if (photoItem.guid === id) {
                     photoInDb = photoItem;
                     var arrByte = Buffer.from(photoInDb.buffer);
@@ -68,12 +67,10 @@ export class MainPhotoService {
         return stream;
     }
 
-
     private upLoadFileToPhoto(file: Photo) {
         var guid = Guid.create().toString();
         return new Photo(guid, file.originalname, file.buffer);
     }
-
 
     public async addPhotoToSession(photo: Photo, session: Photo[]): Promise<any> {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
@@ -90,7 +87,7 @@ export class MainPhotoService {
     public async savePhoto(session: Photo[]): Promise<any> {
         let photoInSession: Photo[] = session[jwtConstants.sessionKey];
         if (photoInSession) {
-            photoInSession.forEach(async photoItem => {
+            for (var photoItem of photoInSession) {
                 let photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
                 if (photoInDb) {
                     await this.photoService.removePhoto(photoInDb);
@@ -99,7 +96,7 @@ export class MainPhotoService {
                     photoItem.buffer = array;
                     await this.photoService.addPhoto(photoItem);
                 }
-            });
+            }
         }
     }
 
@@ -114,12 +111,12 @@ export class MainPhotoService {
             photoInSession.push(photoInDb);
             session[jwtConstants.sessionKey] = photoInSession;
         } else {
-            photoInSession.forEach(async photoItem => {
+            for(var photoItem of photoInSession){
                 if (photoItem.guid === id) {
                     const index = photoInSession.indexOf(photoItem);
                     session[jwtConstants.sessionKey].splice(index);
                 }
-            });
+            }
         }
     }
 
