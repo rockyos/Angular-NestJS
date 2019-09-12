@@ -101,35 +101,13 @@ export class HttpService {
     return this.http.post<string>(url, formData, httpOptions);
   }
 
-  // public googleGet(): Observable<string>{
-  //   const httpOptions = {
-  //     responseType: 'text' as 'json'
-  //   };
-  //   const url = `${environment.apiUrl}Account/ExternalLogin?provider=Google&redirect_uri=https%3A%2F%2Flocalhost%3A44375%2FAccount%2FGoogle`;
-  //   return this.http.get<string>(url, httpOptions);
-  // }
-
-  // public facebookGet(): Observable<string>{
-  //   const httpOptions = {
-  //     responseType: 'text' as 'json'
-  //   };
-  //   const url = `${environment.apiUrl}Account/ExternalLogin?provider=Facebook&redirect_uri=https%3A%2F%2Flocalhost%3A44375%2FAccount%2FFacebook`;
-  //   return this.http.get<string>(url, httpOptions);
-  // }
-
   public googleToken(token: string): Observable<string>{
     const url = `${environment.apiUrl}Account/GoogleGetInfoByToken?token=${token}`;
-    const httpOptions = {
-      responseType: 'text' as 'json'
-    };
-    return this.http.get<string>(url, httpOptions);
+    return this.http.get<string>(url);
   }
 
   public facebookToken(token: string): Observable<string>{
     const url = `${environment.apiUrl}Account/FacebookGetInfoByToken?token=${token}`;
-    const httpOptions = {
-      responseType: 'text' as 'json'
-    };
-    return this.http.get<string>(url, httpOptions);
+    return this.http.get<string>(url);
   }
 }

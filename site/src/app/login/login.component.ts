@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
     this.rememberMe = this.loginForm.controls['userCheckbox'].value;
     this.token.sessionOrLocalStorage(this.rememberMe);
     this.service.loginPost(email, pass).subscribe(resualt => { 
-       this.jwt = resualt['access_token'], 
+       this.jwt = resualt['access_token'],
          this.token.setToken(this.jwt),
          this.token.loggedOn();
     }, error => this.errorMessage = error['error']['message']);
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
   googleBtn() {
     this._auth.login("google").subscribe(
       resualt => {
-        this.user = resualt;
+        this.user = resualt; 
         if (this.user['token'] != null) {
           this.service.googleToken(this.user['token']).subscribe(resualt => {
             this.jwt = resualt['access_token'],
@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
       this.user = resualt;
       if (this.user['token'] != null) {
         this.service.facebookToken(this.user['token']).subscribe(resualt => {
-          this.jwt = resualt['access_token'], console.log(this.jwt),
+          this.jwt = resualt['access_token'], 
             this.token.setToken(this.jwt),
             this.token.loggedOn()
         }, error => {

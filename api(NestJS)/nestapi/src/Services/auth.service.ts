@@ -25,33 +25,30 @@ export class AuthService {
     }
 
     public async login(userDto: UserDto): Promise<any> {
-        return await this.validate(userDto).then((userData) => {
-            if (!userData) {
-                throw new UnauthorizedException('Invalid login attempt!')
-            }
-            if (userData.password !== this.hashPassword(userDto.password)) {
-                throw new UnauthorizedException('Invalid password attempt!');
-            }
-            return this.getAuthToken(userData);
-        });
+        const user = await this.validate(userDto);
+        if (!user) {
+            throw new UnauthorizedException('Invalid login attempt!')
+        }
+        if (user.password !== this.hashPassword(userDto.password)) {
+            throw new UnauthorizedException('Invalid password attempt!');
+        }
+        return this.getAuthToken(user);
     }
 
     public async register(userDto: UserDto): Promise<any> {
-        return await this.validate(userDto).then(async(userData) => {
-            if (userData) {
-                throw new UnauthorizedException('Invalid login attempt!')
-            }
-            let newUser = new User();
-            newUser.email = userDto.email;
-            newUser.password = userDto.password;
-            let newUserAdded = await this.userService.create(newUser);
-            if(newUserAdded){
-                return this.getAuthToken(newUser);
-            } else {
-                throw new UnauthorizedException('Error write to DataBase')
-            }
-         
-        });
+        const user = await this.validate(userDto);
+        if (user) {
+            throw new UnauthorizedException('Invalid login attempt!')
+        }
+        let newUser = new User();
+        newUser.email = userDto.email;
+        newUser.password = userDto.password;
+        let newUserAdded = await this.userService.create(newUser);
+        if(newUserAdded){
+            return this.getAuthToken(newUser);
+        } else {
+            throw new UnauthorizedException('Error write to DataBase')
+        }
     }
 
 
@@ -62,8 +59,7 @@ export class AuthService {
             .pipe(map(async (response: any) => {
                 return response.data['emails'][0]['value'];
             })).toPromise();
-        const result = await this.socialLoginRegistration(email)
-        return result;
+        return await this.socialLoginRegistration(email);
     }
 
     public async facebookTokenAuth(token: string): Promise<any> {
@@ -73,8 +69,7 @@ export class AuthService {
             .pipe(map(async (response: any) => {
                 return response.data['email'];
             })).toPromise();
-        const result = await this.socialLoginRegistration(email)
-        return result;
+        return await this.socialLoginRegistration(email);
     }
 
     private async socialLoginRegistration(email: string) {

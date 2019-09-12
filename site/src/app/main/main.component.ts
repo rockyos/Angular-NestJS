@@ -24,7 +24,7 @@ export class MainComponent implements OnInit {
   }
 
   getData() {
-    this.service.getPhotos().subscribe(resualt => this.photos = resualt,  error => error['error']['statusCode'] == 401 ? this.token.logOut() : null);
+    this.service.getPhotos().subscribe(resualt => this.photos = resualt, error => error['error']['statusCode'] == 401 ? this.btnLogOut() : null);
   }
 
   btnLogOut() {
