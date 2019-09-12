@@ -3,6 +3,7 @@ import { HttpService } from '../http.service';
 import { Photo } from '../photo';
 import { environment } from 'src/environments/environment.prod';
 import { TokenService } from '../token.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -14,7 +15,7 @@ export class MainComponent implements OnInit {
   url = `${environment.apiUrl}api/photo`;
   username: string;
 
-  constructor(private service: HttpService, private token: TokenService) { }
+  constructor(private service: HttpService, private token: TokenService, private router: Router) { }
 
   ngOnInit() {
     this.getData();
@@ -23,7 +24,7 @@ export class MainComponent implements OnInit {
   }
 
   getData() {
-    this.service.getPhotos().subscribe(resualt => this.photos = resualt);
+    this.service.getPhotos().subscribe(resualt => this.photos = resualt,  error => error['error']['statusCode'] == 401 ? this.token.logOut() : null);
   }
 
   btnLogOut() {

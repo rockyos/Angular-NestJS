@@ -50,7 +50,7 @@ export class LoginComponent implements OnInit {
         this.user = resualt;
         if (this.user['token'] != null) {
           this.service.googleToken(this.user['token']).subscribe(resualt => {
-            this.jwt = resualt,
+            this.jwt = resualt['access_token'],
               this.token.setToken(this.jwt),
               this.token.loggedOn()
           }, error => {
@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
       this.user = resualt;
       if (this.user['token'] != null) {
         this.service.facebookToken(this.user['token']).subscribe(resualt => {
-          this.jwt = resualt, console.log(this.jwt),
+          this.jwt = resualt['access_token'], console.log(this.jwt),
             this.token.setToken(this.jwt),
             this.token.loggedOn()
         }, error => {
