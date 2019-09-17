@@ -82,13 +82,12 @@ export class HttpService {
     return this.http.post<string>(url, body);
   }
 
-  public resetPassPost(email, pass, passconfirm, code): Observable<string> {
+  public resetPassPost(email, pass, code): Observable<string> {
     const url = `${environment.apiUrl}Account/ResetPassword`;
     const body = {
       email: email,
       password: pass,
-      ConfirmPassword: passconfirm,
-      Code: code
+      code: code
     };
     return this.http.post<string>(url, body);
   }

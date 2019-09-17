@@ -54,7 +54,11 @@ export class AuthService {
     }
 
     public async forgotpass(email: string): Promise<any> {
+        const emailValid = this.isValidEmail(email);
         const user = await this.userService.findByEmail(email);
+        if (!emailValid) {
+            throw new UnauthorizedException('Wrong email format!');
+        }
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
@@ -62,7 +66,7 @@ export class AuthService {
         let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 465,
-            secure: true, 
+            secure: true,
             auth: {
                 user: "peaceartgallery2019@gmail.com",
                 pass: "Peaceofart_gallery1983"
@@ -70,7 +74,7 @@ export class AuthService {
         });
         let mailOptions = {
             from: '"Peaceofart Gallery" <' + 'peaceartgallery2019@gmail.com' + '>',
-            to: email, 
+            to: email,
             subject: 'Frogotten Password',
             text: 'Forgot Password',
             html: 'Hi! <br><br> If you requested to reset your password<br><br>' +
@@ -79,18 +83,24 @@ export class AuthService {
         const sended = await new Promise<boolean>(async function (resolve, reject) {
             return await transporter.sendMail(mailOptions, async (error, info) => {
                 if (error) {
-                   // console.log('Message sent: %s', error);
                     return reject(false);
                 }
-               // console.log('Message sent: %s', info.messageId);
                 resolve(true);
             });
         })
         return sended;
     }
 
-    public async resetPass(resetPass: ResetPassDto): Promise<any>{
-
+    public async resetPass(resetPass: ResetPassDto): Promise<any> {
+        const user = await this.userService.findByEmail(resetPass.email);
+        if (!user) {
+            throw new UnauthorizedException('Wrong email. User not found!')
+        }
+        if (this.hashPassword(user.email) === resetPass.code) {
+            user.password = this.hashPassword(resetPass.password);
+            return await this.userService.create(user);
+        }
+        throw new UnauthorizedException('Wrong email. User not found!')
     }
 
 

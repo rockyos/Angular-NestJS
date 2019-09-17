@@ -20,14 +20,26 @@ export class ResetpasswordComponent implements OnInit {
       resEmail: ["", [Validators.required, Validators.email]],
       resPass: ["", Validators.required],
       resPassConfirm: ["", Validators.required]
-    });
+    }, {validator: this.checkIfMatchingPasswords('resPass', 'resPassConfirm')});
+  }
+
+  private checkIfMatchingPasswords(passwordKey: string, passwordConfirmationKey: string) {
+    return (group: FormGroup) => {
+      const passwordInput = group.controls[passwordKey],
+        passwordConfirmationInput = group.controls[passwordConfirmationKey];
+      if (passwordInput.value !== passwordConfirmationInput.value) {
+        return passwordConfirmationInput.setErrors({notEquivalent: true});
+      } else {
+        return passwordConfirmationInput.setErrors(null);
+      }
+    };
   }
 
   ngOnInit() {
   }
 
-  resetPassSend(email: string, pass: string, passconfirm: string){
-    this.service.resetPassPost(email, pass, passconfirm, this.code).subscribe(resualt => 
+  resetPassSend(email: string, pass: string){
+    this.service.resetPassPost(email, pass, this.code).subscribe(resualt => 
       this.router.navigate(['Account/ResetPasswordConfirmation']),
       error => this.errorMessage = error['error']['message']
       );
