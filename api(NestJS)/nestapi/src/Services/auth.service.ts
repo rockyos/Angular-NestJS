@@ -6,7 +6,6 @@ import { User } from '../Models/Entity/user.entity';
 import * as crypto from 'crypto';
 import { map } from 'rxjs/operators';
 import { UserDto } from 'src/Models/DTO/userDto';
-//import { nodemailer } from 'nodemailer'
 var nodemailer = require('nodemailer');
 import { ResetPassDto } from 'src/Models/DTO/resetpassDto';
 
@@ -20,6 +19,14 @@ export class AuthService {
 
     private async validate(userData: UserDto): Promise<User> {
         return await this.userService.findByEmail(userData.email);
+    }
+
+    private async dateValidUpdate(user: User): Promise<User> {
+        if (user.createOrResetPassDate.getDay() < new Date().getDay() + 7) {
+            user.createOrResetPassDate = new Date();
+            return await this.userService.createOrUpdate(user);
+        }
+        return;
     }
 
     public async login(userDto: UserDto): Promise<any> {
@@ -45,7 +52,8 @@ export class AuthService {
         let newUser = new User();
         newUser.email = userDto.email;
         newUser.password = userDto.password;
-        let newUserAdded = await this.userService.create(newUser);
+        newUser.createOrResetPassDate = new Date();
+        let newUserAdded = await this.userService.createOrUpdate(newUser);
         if (newUserAdded) {
             return this.getAuthToken(newUser);
         } else {
@@ -62,7 +70,8 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
-        const code = this.hashPassword(email);
+        const updateUser = await this.dateValidUpdate(user);
+        const code = this.hashPassword(email + updateUser.createOrResetPassDate.toString());
         let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 465,
@@ -96,11 +105,12 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
-        if (this.hashPassword(user.email) === resetPass.code) {
-            user.password = this.hashPassword(resetPass.password);
-            return await this.userService.create(user);
+        if (this.hashPassword(user.email + user.createOrResetPassDate.toString()) === resetPass.code) {
+            user.password = this.hashPassword(resetPass.password); //resetPass.password
+            user.createOrResetPassDate = new Date();
+            return await this.userService.createOrUpdate(user);
         }
-        throw new UnauthorizedException('Wrong email. User not found!')
+        throw new UnauthorizedException('Sorry, code was expired or used! Use reset form again.')
     }
 
 
@@ -133,7 +143,7 @@ export class AuthService {
             user = new User();
             user.email = email;
             user.password = this.generatePassword(8);
-            let newUser = await this.userService.create(user);
+            let newUser = await this.userService.createOrUpdate(user);
             if (newUser) {
                 return this.getAuthToken(newUser);
             } else {
