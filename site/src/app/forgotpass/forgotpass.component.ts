@@ -24,7 +24,7 @@ export class ForgotpassComponent implements OnInit {
   forgotPassSend(email: string) {
     this.service.forgotPassPost(email).subscribe(resualt =>
       this.router.navigate(['Account/ForgotPasswordConfirmation']),
-      error => this.errorMessage = error['error']
+      error => this.errorMessage = error['error']['message']
     );
   }
 

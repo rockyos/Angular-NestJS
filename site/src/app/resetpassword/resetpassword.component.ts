@@ -29,7 +29,7 @@ export class ResetpasswordComponent implements OnInit {
   resetPassSend(email: string, pass: string, passconfirm: string){
     this.service.resetPassPost(email, pass, passconfirm, this.code).subscribe(resualt => 
       this.router.navigate(['Account/ResetPasswordConfirmation']),
-      error => this.errorMessage = error['error']
+      error => this.errorMessage = error['error']['message']
       );
   }
 

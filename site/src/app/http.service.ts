@@ -76,19 +76,21 @@ export class HttpService {
 
   public forgotPassPost(email): Observable<string> {
     const url = `${environment.apiUrl}Account/ForgotPassword`;
-    const formData = new FormData();
-    formData.append('Email', email);
-    return this.http.post<string>(url, formData);
+    const body = {
+      email: email
+    };
+    return this.http.post<string>(url, body);
   }
 
   public resetPassPost(email, pass, passconfirm, code): Observable<string> {
     const url = `${environment.apiUrl}Account/ResetPassword`;
-    const formData = new FormData();
-    formData.append('Email', email);
-    formData.append('Password', pass);
-    formData.append('ConfirmPassword', passconfirm);
-    formData.append('Code', code);
-    return this.http.post<string>(url, formData);
+    const body = {
+      email: email,
+      password: pass,
+      ConfirmPassword: passconfirm,
+      Code: code
+    };
+    return this.http.post<string>(url, body);
   }
 
   public registerExtPost(email): Observable<string> {
