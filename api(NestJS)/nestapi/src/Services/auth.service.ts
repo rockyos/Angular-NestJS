@@ -8,21 +8,40 @@ import { map } from 'rxjs/operators';
 import { UserDto } from 'src/Models/DTO/userDto';
 var nodemailer = require('nodemailer');
 import { ResetPassDto } from 'src/Models/DTO/resetpassDto';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
-        private readonly httpService: HttpService
-    ) { }
+        private readonly httpService: HttpService,
+        readonly config: ConfigService
+    ) {
+       this.linkValidInHours = config.getNumber('LINK_VALID_IN_HOURS');
+       this.mailHost = config.getString('MAIL_HOST');
+       this.mailPort = config.getNumber('MAIL_PORT');
+       this.mailSecure = config.getBool('MAIL_SECURE');
+       this.mailUser = config.getString('MAIL_USER');
+       this.mailPass = config.getString('MAIL_PASSWORD');
+       this.hostUrl = config.getString('HOST_URL');
+       this.hostPort = config.getNumber('HOST_PORT'); 
+    }
 
+    linkValidInHours: number;
+    mailHost: string;
+    mailPort: number;
+    mailSecure: boolean;
+    mailUser: string;
+    mailPass: string;
+    hostUrl: string;
+    hostPort: number;
     private async validate(userData: UserDto): Promise<User> {
         return await this.userService.findByEmail(userData.email);
     }
 
     private async dateValidUpdate(user: User): Promise<User> {
-        let userDiffDate = user.createOrResetPassDate.getTime() + 5 * 60 * 1000;
+        let userDiffDate = user.createOrResetPassDate.getTime() + this.linkValidInHours * 60 * 60 * 1000;
         let nowDate = new Date().getTime();
         if (userDiffDate < nowDate) {
             user.createOrResetPassDate = new Date();
@@ -76,24 +95,23 @@ export class AuthService {
         const updateUser = await this.userService.createOrUpdate(user);
         const code = this.hashPassword(email + updateUser.createOrResetPassDate.toString());
         let transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
+            host: this.mailHost,
+            port: this.mailPort,
+            secure: this.mailSecure,
             auth: {
-                user: "peaceartgallery2019@gmail.com",
-                pass: "Peaceofart_gallery1983"
+                user: this.mailUser,
+                pass: this.mailPass
             }
         });
         let mailOptions = {
-            from: '"Peaceofart Gallery" <' + 'peaceartgallery2019@gmail.com' + '>',
+            from: '"Peaceofart Gallery" <' + this.mailUser + '>',
             to: email,
             subject: 'Frogotten Password',
             text: 'Forgot Password',
-            html: 'Hi! <br><br> If you requested to reset your password(Link valid '+ '' +' hours)<br><br>' +
-                '<a href=' + 'http://localhost' + ':' + 3000 + '/Account/ResetPassword?code=' + code + '>Click here</a>'
+            html: 'Hi! <br><br> If you requested to reset your password(Link valid: ' + this.linkValidInHours + ' hours)<br><br>' +
+                '<a href=' + this.hostUrl + ':' + this.hostPort + '/Account/ResetPassword?code=' + code + '>Click here</a>'
         };
         return await transporter.sendMail(mailOptions);
-
     }
 
     public async resetPass(resetPass: ResetPassDto): Promise<any> {
