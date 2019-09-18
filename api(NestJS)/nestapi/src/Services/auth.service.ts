@@ -22,11 +22,13 @@ export class AuthService {
     }
 
     private async dateValidUpdate(user: User): Promise<User> {
-        if (user.createOrResetPassDate.getDay() < new Date().getDay() + 7) {
+        let userDiffDate = user.createOrResetPassDate.getTime() + 5 * 60 * 1000;
+        let nowDate = new Date().getTime();
+        if (userDiffDate < nowDate) {
             user.createOrResetPassDate = new Date();
             return await this.userService.createOrUpdate(user);
         }
-        return;
+        return user;
     }
 
     public async login(userDto: UserDto): Promise<any> {
@@ -63,14 +65,15 @@ export class AuthService {
 
     public async forgotpass(email: string): Promise<any> {
         const emailValid = this.isValidEmail(email);
-        const user = await this.userService.findByEmail(email);
+        let user = await this.userService.findByEmail(email);
         if (!emailValid) {
             throw new UnauthorizedException('Wrong email format!');
         }
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
-        const updateUser = await this.dateValidUpdate(user);
+        user.createOrResetPassDate = new Date();
+        const updateUser = await this.userService.createOrUpdate(user);
         const code = this.hashPassword(email + updateUser.createOrResetPassDate.toString());
         let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
@@ -86,18 +89,11 @@ export class AuthService {
             to: email,
             subject: 'Frogotten Password',
             text: 'Forgot Password',
-            html: 'Hi! <br><br> If you requested to reset your password<br><br>' +
+            html: 'Hi! <br><br> If you requested to reset your password(Link valid '+ '' +' hours)<br><br>' +
                 '<a href=' + 'http://localhost' + ':' + 3000 + '/Account/ResetPassword?code=' + code + '>Click here</a>'
         };
-        const sended = await new Promise<boolean>(async function (resolve, reject) {
-            return await transporter.sendMail(mailOptions, async (error, info) => {
-                if (error) {
-                    return reject(false);
-                }
-                resolve(true);
-            });
-        })
-        return sended;
+        return await transporter.sendMail(mailOptions);
+
     }
 
     public async resetPass(resetPass: ResetPassDto): Promise<any> {
@@ -105,10 +101,12 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
-        if (this.hashPassword(user.email + user.createOrResetPassDate.toString()) === resetPass.code) {
-            user.password = this.hashPassword(resetPass.password); //resetPass.password
-            user.createOrResetPassDate = new Date();
-            return await this.userService.createOrUpdate(user);
+        const updateUser = await this.dateValidUpdate(user);
+        const getHashPass = this.hashPassword(updateUser.email + updateUser.createOrResetPassDate.toString())
+        if (getHashPass === resetPass.code) {
+            updateUser.password = this.hashPassword(resetPass.password); //resetPass.password
+            updateUser.createOrResetPassDate = new Date();
+            return await this.userService.createOrUpdate(updateUser);
         }
         throw new UnauthorizedException('Sorry, code was expired or used! Use reset form again.')
     }
