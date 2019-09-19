@@ -4,8 +4,18 @@ import * as fs from 'fs';
 export class ConfigService {
   private readonly envConfig: { [key: string]: any };
 
-  constructor(filePath: string) {
-    this.envConfig = dotenv.parse(fs.readFileSync(filePath))
+  constructor() {
+    let filePath = `development.env`;
+    if (process.env.NODE_ENV) {
+      filePath = `${process.env.NODE_ENV}.env`;
+    }
+    try {
+      fs.statSync(filePath);
+    } catch {
+      filePath = `development.env`;
+    }
+    this.envConfig = dotenv.parse(fs.readFileSync(filePath));
+
   }
 
   getString(key: string): string {
@@ -18,5 +28,9 @@ export class ConfigService {
 
   getBool(key: string): boolean {
     return this.envConfig[key];
+  }
+
+  get DatabaseType(): any {
+    return this.envConfig.DB_TYPE;
   }
 }
