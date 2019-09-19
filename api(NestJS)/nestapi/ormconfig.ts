@@ -1,3 +1,4 @@
+
 export = {
     type: 'postgres',
     host: 'localhost',
