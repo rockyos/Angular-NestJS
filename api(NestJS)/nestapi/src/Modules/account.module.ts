@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from '../Services/user.service';
 import { AuthService } from '../Services/auth.service';
-import { jwtConstants } from '../constants';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from 'src/Strategy/jwt.strategy';
 import { ConfigModule } from 'src/config/config.module';
@@ -13,7 +12,7 @@ import { ConfigModule } from 'src/config/config.module';
 @Module({
   imports: [TypeOrmModule.forFeature([User]),
   JwtModule.register({
-    secret: jwtConstants.secret,
+    secret: '123456789ITSMYKEY',
     signOptions: { expiresIn: '3600s' }
   }), HttpModule, PassportModule, ConfigModule ],
   controllers: [AccountController],

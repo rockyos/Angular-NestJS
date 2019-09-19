@@ -4,17 +4,22 @@ import { PhotoDto } from "src/Models/DTO/photoDto";
 import { Photo } from "src/Models/Entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
-import { jwtConstants } from "../constants"
+import { ConfigService } from "src/config/config.service";
 const sharp = require("sharp");
 
 @Injectable()
 export class MainPhotoService {
     constructor(
         private readonly photoService: PhotoService,
-    ) { }
+        readonly config: ConfigService
+    ) {
+        this.sessionKey = this.config.getString('SESSION_KEY')
+     }
+
+    sessionKey: string;
 
     public async getPhotoAll(session: Photo[]): Promise<PhotoDto[]> {
-        let photosInSession: Photo[] = session[jwtConstants.sessionKey];
+        let photosInSession: Photo[] = session[this.sessionKey];
         let photosInDb = await this.photoService.findAll();
         if (photosInSession) {
             let hidePhotoFromSession: Photo[] = [];
@@ -42,7 +47,7 @@ export class MainPhotoService {
     public async getImage(session: Photo[], id: string, width: string): Promise<any> {
         let photoInDb = await this.photoService.findOneByGuid(id);
         if (!photoInDb) {
-            let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+            let photoInSession: Photo[] = session[this.sessionKey];
             for (var photoItem of photoInSession) {
                 if (photoItem.guid === id) {
                     photoInDb = photoItem;
@@ -73,19 +78,19 @@ export class MainPhotoService {
     }
 
     public async addPhotoToSession(photo: Photo, session: Photo[]): Promise<any> {
-        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        let photoInSession: Photo[] = session[this.sessionKey];
         if (photoInSession) {
             photoInSession.push(this.upLoadFileToPhoto(photo));
-            session[jwtConstants.sessionKey] = photoInSession;
+            session[this.sessionKey] = photoInSession;
         } else {
             let photoInSession: Photo[] = [];
             photoInSession.push(this.upLoadFileToPhoto(photo));
-            session[jwtConstants.sessionKey] = photoInSession;
+            session[this.sessionKey] = photoInSession;
         }
     }
 
     public async savePhoto(session: Photo[]): Promise<any> {
-        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        let photoInSession: Photo[] = session[this.sessionKey];
         if (photoInSession) {
             for (var photoItem of photoInSession) {
                 let photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
@@ -101,26 +106,26 @@ export class MainPhotoService {
     }
 
     public async deletePhoto(session: Photo[], id: string): Promise<any> {
-        let photoInSession: Photo[] = session[jwtConstants.sessionKey];
+        let photoInSession: Photo[] = session[this.sessionKey];
         const photoInDb = await this.photoService.findOneByGuid(id);
         if (photoInDb) {
-            photoInSession = session[jwtConstants.sessionKey];
+            photoInSession = session[this.sessionKey];
             if (!photoInSession) {
                 photoInSession = [];
             }
             photoInSession.push(photoInDb);
-            session[jwtConstants.sessionKey] = photoInSession;
+            session[this.sessionKey] = photoInSession;
         } else {
             for(var photoItem of photoInSession){
                 if (photoItem.guid === id) {
                     const index = photoInSession.indexOf(photoItem);
-                    session[jwtConstants.sessionKey].splice(index);
+                    session[this.sessionKey].splice(index);
                 }
             }
         }
     }
 
     public async resetPhoto(session: Photo[]): Promise<any> {
-        session[jwtConstants.sessionKey] = undefined;
+        session[this.sessionKey] = undefined;
     }
 }

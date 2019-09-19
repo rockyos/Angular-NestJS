@@ -36,6 +36,7 @@ export class AuthService {
     mailPass: string;
     hostUrl: string;
     hostPort: number;
+
     private async validate(userData: UserDto): Promise<User> {
         return await this.userService.findByEmail(userData.email);
     }
@@ -159,6 +160,7 @@ export class AuthService {
             user = new User();
             user.email = email;
             user.password = this.generatePassword(8);
+            user.createOrResetPassDate = new Date();
             let newUser = await this.userService.createOrUpdate(user);
             if (newUser) {
                 return this.getAuthToken(newUser);
