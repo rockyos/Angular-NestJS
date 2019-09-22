@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards, Post, UploadedFile, UseInterceptors, Param, Query, Res, Session, Delete, CacheInterceptor } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
-import { Photo } from 'src/Models/Entity/photo.entity';
-import { PhotoDto } from 'src/Models/DTO/photoDto';
-import { MainPhotoService } from 'src/Services1/mainphoto.service';
+import { Photo } from 'src/models/entity/photo.entity';
+import { PhotoDto } from 'src/models/dto/photoDto';
+import { MainPhotoService } from 'src/services/mainphoto.service';
 
 @Controller('api/photo')
 //@UseInterceptors(CacheInterceptor)

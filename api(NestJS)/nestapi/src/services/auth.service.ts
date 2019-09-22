@@ -2,12 +2,12 @@ import { Injectable, HttpService } from '@nestjs/common';
 import { InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from './user.service';
-import { User } from '../Models/Entity/user.entity';
+import { User } from '../models/entity/user.entity';
 import * as crypto from 'crypto';
 import { map } from 'rxjs/operators';
-import { UserDto } from 'src/Models/DTO/userDto';
+import { UserDto } from 'src/models/dto/userDto';
 var nodemailer = require('nodemailer');
-import { ResetPassDto } from 'src/Models/DTO/resetpassDto';
+import { ResetPassDto } from 'src/models/dto/resetpassDto';
 import { ConfigService } from 'src/config/config.service';
 
 @Injectable()

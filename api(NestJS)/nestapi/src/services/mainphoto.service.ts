@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PhotoService } from "./photo.service";
-import { PhotoDto } from "src/Models/DTO/photoDto";
-import { Photo } from "src/Models/Entity/photo.entity";
+import { PhotoDto } from "src/models/dto/photoDto";
+import { Photo } from "src/models/entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
 import { ConfigService } from "src/config/config.service";

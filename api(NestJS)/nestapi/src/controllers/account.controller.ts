@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Get, Query, Res, Param } from '@nestjs/common';
-import { AuthService } from '../Services1/auth.service';
-import { UserDto } from 'src/Models/DTO/userDto';
+import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
+import { AuthService } from '../services/auth.service';
 import { Response } from 'express';
-import { ResetPassDto } from 'src/Models/DTO/resetpassDto';
+import { ResetPassDto } from 'src/models/dto/resetpassDto';
+import { UserDto } from 'src/models/dto/userDto';
 
 
 @Controller('Account')
