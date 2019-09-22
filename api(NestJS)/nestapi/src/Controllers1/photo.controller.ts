@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { Photo } from 'src/Models/Entity/photo.entity';
 import { PhotoDto } from 'src/Models/DTO/photoDto';
-import { MainPhotoService } from 'src/Services/mainphoto.service';
+import { MainPhotoService } from 'src/Services1/mainphoto.service';
 
 @Controller('api/photo')
 //@UseInterceptors(CacheInterceptor)
