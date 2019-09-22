@@ -78,4 +78,47 @@ export class ConfigService {
     return this.envConfig.DB_MIGRATIONDIR;
   }
 
+  get  HostUrl(): string {
+    return this.envConfig.HOST_URL;
+  }
+
+  get  HostPort(): number {
+    return this.envConfig.HOST_PORT;
+  }
+
+  get  MailHost(): string {
+    return this.envConfig.MAIL_HOST;
+  }
+
+  get  MailPort(): number {
+    return this.envConfig.MAIL_PORT;
+  }
+
+  get  MailSecure(): boolean {
+    return this.envConfig.MAIL_SECURE;
+  }
+
+  get  MailUser(): string {
+    return this.envConfig.MAIL_USER;
+  }
+
+  get  MailPass(): string {
+    return this.envConfig.MAIL_PASSWORD;
+  }
+
+  get  MailLinkValid(): number {
+    return this.envConfig.LINK_VALID_IN_HOURS;
+  }
+
+  get  SessionKey(): string {
+    return this.envConfig.SESSION_KEY;
+  }
+
+  get  JwtSecretKey(): string {
+    return this.envConfig.JWT_SECRET_KEY;
+  }
+
+  get  JwtInspires(): string {
+    return this.envConfig.JWT_EXPIRES;
+  }
 }

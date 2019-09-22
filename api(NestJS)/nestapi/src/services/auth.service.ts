@@ -16,33 +16,15 @@ export class AuthService {
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
         private readonly httpService: HttpService,
-        readonly config: ConfigService
-    ) {
-       this.linkValidInHours = config.getNumber('LINK_VALID_IN_HOURS');
-       this.mailHost = config.getString('MAIL_HOST');
-       this.mailPort = config.getNumber('MAIL_PORT');
-       this.mailSecure = config.getBool('MAIL_SECURE');
-       this.mailUser = config.getString('MAIL_USER');
-       this.mailPass = config.getString('MAIL_PASSWORD');
-       this.hostUrl = config.getString('HOST_URL');
-       this.hostPort = config.getNumber('HOST_PORT'); 
-    }
-
-    linkValidInHours: number;
-    mailHost: string;
-    mailPort: number;
-    mailSecure: boolean;
-    mailUser: string;
-    mailPass: string;
-    hostUrl: string;
-    hostPort: number;
+        private readonly config: ConfigService
+    ) {  }
 
     private async validate(userData: UserDto): Promise<User> {
         return await this.userService.findByEmail(userData.email);
     }
 
     private async dateValidUpdate(user: User): Promise<User> {
-        let userDiffDate = user.createOrResetPassDate.getTime() + this.linkValidInHours * 60 * 60 * 1000;
+        let userDiffDate = user.createOrResetPassDate.getTime() + this.config.MailLinkValid * 60 * 60 * 1000;
         let nowDate = new Date().getTime();
         if (userDiffDate < nowDate) {
             user.createOrResetPassDate = new Date();
@@ -96,21 +78,21 @@ export class AuthService {
         const updateUser = await this.userService.createOrUpdate(user);
         const code = this.hashPassword(email + updateUser.createOrResetPassDate.toString());
         let transporter = nodemailer.createTransport({
-            host: this.mailHost,
-            port: this.mailPort,
-            secure: this.mailSecure,
+            host: this.config.MailHost,
+            port: this.config.MailPort,
+            secure: this.config.MailSecure,
             auth: {
-                user: this.mailUser,
-                pass: this.mailPass
+                user: this.config.MailUser,
+                pass: this.config.MailPort
             }
         });
         let mailOptions = {
-            from: '"Peaceofart Gallery" <' + this.mailUser + '>',
+            from: '"Peaceofart Gallery" <' + this.config.MailUser + '>',
             to: email,
             subject: 'Frogotten Password',
             text: 'Forgot Password',
-            html: 'Hi! <br><br> If you requested to reset your password(Link valid: ' + this.linkValidInHours + ' hours)<br><br>' +
-                '<a href=' + this.hostUrl + ':' + this.hostPort + '/Account/ResetPassword?code=' + code + '>Click here</a>'
+            html: 'Hi! <br><br> If you requested to reset your password(Link valid: ' + this.config.MailLinkValid + ' hours)<br><br>' +
+                '<a href=' + this.config.HostUrl + ':' + this.config.HostPort + '/Account/ResetPassword?code=' + code + '>Click here</a>'
         };
         return await transporter.sendMail(mailOptions);
     }

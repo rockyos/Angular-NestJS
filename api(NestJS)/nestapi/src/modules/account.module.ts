@@ -8,13 +8,15 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from 'src/strategy/jwt.strategy';
 import { ConfigModule } from 'src/config/config.module';
 import { User } from 'src/models/entity/user.entity';
+import { ConfigService } from 'src/config/config.service';
 
+const config = new ConfigService();
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]),
   JwtModule.register({
-    secret: '123456789ITSMYKEY',
-    signOptions: { expiresIn: '3600s' }
+    secret: config.JwtSecretKey,
+    signOptions: { expiresIn: config.JwtInspires }
   }), HttpModule, PassportModule, ConfigModule ],
   controllers: [AccountController],
   providers: [ UserService, AuthService, JwtStrategy],
