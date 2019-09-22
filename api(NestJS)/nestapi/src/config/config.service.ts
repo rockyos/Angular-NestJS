@@ -33,4 +33,49 @@ export class ConfigService {
   get DatabaseType(): any {
     return this.envConfig.DB_TYPE;
   }
+
+  get DatabaseHost(): any {
+    return this.envConfig.DB_HOST;
+  }
+
+  get  DatabasePort(): number {
+    return this.envConfig.DB_PORT;
+  }
+
+  get  DatabaseUserName(): string {
+    return this.envConfig.DB_USERNAME;
+  }
+
+  get  DatabasePass(): string {
+    return this.envConfig.DB_PASSWORD;
+  }
+
+  get  DatabaseDbName(): string {
+    return this.envConfig.DB_DATABASE;
+  }
+
+  get  DatabaseEntities(): string {
+    return this.envConfig.DB_ENTITIES;
+  }
+
+  get  DatabaseMigrations(): string {
+    return this.envConfig.DB_MIGRATION;
+  }
+
+  get  DatabaseMigrationsTable(): string {
+    return this.envConfig.DB_MIGRAT_TABLE;
+  }
+
+  get  DatabaseMigrationsRun(): boolean {
+    return this.envConfig.DB_MIGRAT_RUN;
+  }
+
+  get  DatabaseSynchronize(): boolean {
+    return this.envConfig.DB_SYNCHRONIZE;
+  }
+
+  get  DatabaseMigrationsDir(): string {
+    return this.envConfig.DB_MIGRATIONDIR;
+  }
+
 }
