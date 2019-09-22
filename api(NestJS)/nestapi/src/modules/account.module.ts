@@ -9,6 +9,7 @@ import { JwtStrategy } from 'src/strategy/jwt.strategy';
 import { ConfigModule } from 'src/config/config.module';
 import { User } from 'src/models/entity/user.entity';
 
+
 @Module({
   imports: [TypeOrmModule.forFeature([User]),
   JwtModule.register({
