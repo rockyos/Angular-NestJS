@@ -114,6 +114,18 @@ export class ConfigService {
     return this.envConfig.SESSION_KEY;
   }
 
+  get SessionSecret(): string{
+    return this.envConfig.SESSION_SECRET;
+  }
+
+  get SessionReSave(): boolean{
+    return this.envConfig.SESSION_RESAVE;
+  }
+
+  get SessionSaveUnitialized(): boolean{
+    return this.envConfig.SESSION_SAVEUNITILIZED;
+  }
+  
   get  JwtSecretKey(): string {
     return this.envConfig.JWT_SECRET_KEY;
   }
@@ -121,4 +133,6 @@ export class ConfigService {
   get  JwtInspires(): string {
     return this.envConfig.JWT_EXPIRES;
   }
+
+ 
 }

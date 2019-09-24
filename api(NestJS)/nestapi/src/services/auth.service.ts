@@ -83,7 +83,7 @@ export class AuthService {
             secure: this.config.MailSecure,
             auth: {
                 user: this.config.MailUser,
-                pass: this.config.MailPort
+                pass: this.config.MailPass
             }
         });
         let mailOptions = {
