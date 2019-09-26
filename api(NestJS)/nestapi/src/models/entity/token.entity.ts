@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as crypto from 'crypto';
 
 @Entity()
-export class User {
+export class Token {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -11,10 +11,10 @@ export class User {
 
   @BeforeInsert()
   hashPassword() {
-    this.password = crypto.createHmac('sha256', this.password).digest('hex');
+    this.token = crypto.createHmac('sha256', this.token).digest('hex');
   }
   @Column()
-  password: string;
+  token: string;
 
   @Column()
   createDate: Date;

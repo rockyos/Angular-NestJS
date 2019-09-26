@@ -9,28 +9,21 @@ import { UserDto } from 'src/models/dto/userDto';
 var nodemailer = require('nodemailer');
 import { ResetPassDto } from 'src/models/dto/resetpassDto';
 import { ConfigService } from 'src/config/config.service';
+import { Token } from 'src/models/entity/token.entity';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
+        private readonly tokenService: TokenService,
         private readonly httpService: HttpService,
         private readonly config: ConfigService
     ) {  }
 
     private async validate(userData: UserDto): Promise<User> {
         return await this.userService.findByEmail(userData.email);
-    }
-
-    private async dateValidUpdate(user: User): Promise<User> {
-        let userDiffDate = user.createOrResetPassDate.getTime() + this.config.MailLinkValid * 60 * 60 * 1000;
-        let nowDate = new Date().getTime();
-        if (userDiffDate < nowDate) {
-            user.createOrResetPassDate = new Date();
-            return await this.userService.createOrUpdate(user);
-        }
-        return user;
     }
 
     public async login(userDto: UserDto): Promise<any> {
@@ -56,7 +49,7 @@ export class AuthService {
         let newUser = new User();
         newUser.email = userDto.email;
         newUser.password = userDto.password;
-        newUser.createOrResetPassDate = new Date();
+        newUser.createDate = new Date();
         let newUserAdded = await this.userService.createOrUpdate(newUser);
         if (newUserAdded) {
             return this.getAuthToken(newUser);
@@ -74,9 +67,14 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
-        user.createOrResetPassDate = new Date();
-        const updateUser = await this.userService.createOrUpdate(user);
-        const code = this.hashPassword(email + updateUser.createOrResetPassDate.toString());
+        const tokenCreateDate = new Date();
+        const token =  email + tokenCreateDate.getTime();
+        let newToken = new Token();
+        newToken.email = email;
+        newToken.createDate = tokenCreateDate;
+        newToken.token = token;
+        let createdToken =  await this.tokenService.create(newToken);
+        const code = createdToken.token;
         let transporter = nodemailer.createTransport({
             host: this.config.MailHost,
             port: this.config.MailPort,
@@ -102,12 +100,15 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Wrong email. User not found!')
         }
-        const updateUser = await this.dateValidUpdate(user);
-        const getHashPass = this.hashPassword(updateUser.email + updateUser.createOrResetPassDate.toString())
-        if (getHashPass === resetPass.code) {
-            updateUser.password = this.hashPassword(resetPass.password); //resetPass.password
-            updateUser.createOrResetPassDate = new Date();
-            return await this.userService.createOrUpdate(updateUser);
+        const token = await this.tokenService.findByToken(resetPass.code);
+        if (token) {
+           let updateUser = user;
+           updateUser.password = this.hashPassword(resetPass.password);
+           const updatedUser = await this.userService.createOrUpdate(updateUser);
+           if(updatedUser){
+               await  this.tokenService.deleteByToken(token);
+           }
+           return;
         }
         throw new UnauthorizedException('Sorry, code was expired or used! Use reset form again.')
     }
@@ -142,7 +143,7 @@ export class AuthService {
             user = new User();
             user.email = email;
             user.password = this.generatePassword(8);
-            user.createOrResetPassDate = new Date();
+            user.createDate = new Date();
             let newUser = await this.userService.createOrUpdate(user);
             if (newUser) {
                 return this.getAuthToken(newUser);
