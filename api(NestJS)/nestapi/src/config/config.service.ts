@@ -134,5 +134,8 @@ export class ConfigService {
     return this.envConfig.JWT_EXPIRES;
   }
 
- 
+  get  TaskInterval(): number {
+    return this.envConfig.TASK_INTERVAL;
+  }
+  
 }

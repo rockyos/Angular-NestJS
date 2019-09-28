@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as crypto from 'crypto';
 
 @Entity()
-export class Token {
+export class TokenReset {
   @PrimaryGeneratedColumn()
   id: number;
 

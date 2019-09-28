@@ -9,15 +9,17 @@ import { UserDto } from 'src/models/dto/userDto';
 var nodemailer = require('nodemailer');
 import { ResetPassDto } from 'src/models/dto/resetpassDto';
 import { ConfigService } from 'src/config/config.service';
-import { Token } from 'src/models/entity/token.entity';
-import { TokenService } from './token.service';
+import { TokenResetService } from './tokenreset.service';
+import { TokenReset } from 'src/models/entity/tokenreset.entity';
+
+
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
-        private readonly tokenService: TokenService,
+        private readonly tokenService: TokenResetService,
         private readonly httpService: HttpService,
         private readonly config: ConfigService
     ) {  }
@@ -69,7 +71,7 @@ export class AuthService {
         }
         const tokenCreateDate = new Date();
         const token =  email + tokenCreateDate.getTime();
-        let newToken = new Token();
+        let newToken = new TokenReset();
         newToken.email = email;
         newToken.createDate = tokenCreateDate;
         newToken.token = token;
@@ -106,7 +108,7 @@ export class AuthService {
            updateUser.password = this.hashPassword(resetPass.password);
            const updatedUser = await this.userService.createOrUpdate(updateUser);
            if(updatedUser){
-               await  this.tokenService.deleteByToken(token);
+               await this.tokenService.deleteByToken(token);
            }
            return;
         }

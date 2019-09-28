@@ -9,19 +9,19 @@ import { JwtStrategy } from 'src/strategy/jwt.strategy';
 import { ConfigModule } from 'src/config/config.module';
 import { User } from 'src/models/entity/user.entity';
 import { ConfigService } from 'src/config/config.service';
-import { Token } from 'src/models/entity/token.entity'
-import { TokenService } from '../services/token.service';
+import { TaskService } from '../services/task.service'
+import { TokenReset } from 'src/models/entity/tokenreset.entity';
+import { TokenResetService } from 'src/services/tokenreset.service';
 
 const config = new ConfigService();
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), 
-  TypeOrmModule.forFeature([Token]),
+  imports: [TypeOrmModule.forFeature([User, TokenReset]), 
   JwtModule.register({
     secret: config.JwtSecretKey,
     signOptions: { expiresIn: config.JwtInspires }
   }), HttpModule, PassportModule, ConfigModule ],
   controllers: [AccountController],
-  providers: [ UserService, AuthService, TokenService, JwtStrategy ],
+  providers: [ UserService, AuthService, TaskService, TokenResetService, JwtStrategy ],
 })
 export class AccountModule { }
