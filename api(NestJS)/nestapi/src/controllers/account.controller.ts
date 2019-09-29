@@ -30,8 +30,8 @@ export class AccountController {
     }
 
     @Get('ResetPassword')
-    async resetPassGet(@Query('code') code, @Res() res: Response): Promise<any> {
-        const redirectUrl = 'http://localhost:4200/Account/ResetPassword?code=' + code;
+    async resetPassGet(@Query('code') code, @Query('email') email, @Res() res: Response): Promise<any> {
+        const redirectUrl = `http://localhost:4200/Account/ResetPassword?code=${code}&email=${email}`;
         return res.redirect(redirectUrl);
     }
 

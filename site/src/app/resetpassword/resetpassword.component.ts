@@ -12,12 +12,13 @@ export class ResetpasswordComponent implements OnInit {
   errorMessage: string;
   resetPassForm: FormGroup;
   code: string;
+  email: string;
 
   constructor(private service: HttpService, private router: Router, private activateRoute: ActivatedRoute, private fb: FormBuilder) {
     this.code = this.activateRoute.snapshot.queryParamMap.get("code");
+    this.email = this.activateRoute.snapshot.queryParamMap.get("email");
     this.code = this.code.replace(/\s+/g, '+');
     this.resetPassForm = this.fb.group({
-      resEmail: ["", [Validators.required, Validators.email]],
       resPass: ["", Validators.required],
       resPassConfirm: ["", Validators.required]
     }, {validator: this.checkIfMatchingPasswords('resPass', 'resPassConfirm')});
@@ -38,8 +39,8 @@ export class ResetpasswordComponent implements OnInit {
   ngOnInit() {
   }
 
-  resetPassSend(email: string, pass: string){
-    this.service.resetPassPost(email, pass, this.code).subscribe(resualt => 
+  resetPassSend(pass: string){
+    this.service.resetPassPost(this.email, pass, this.code).subscribe(resualt => 
       this.router.navigate(['Account/ResetPasswordConfirmation']),
       error => this.errorMessage = error['error']['message']
       );

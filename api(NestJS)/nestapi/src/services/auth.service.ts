@@ -91,8 +91,8 @@ export class AuthService {
             to: email,
             subject: 'Frogotten Password',
             text: 'Forgot Password',
-            html: 'Hi! <br><br> If you requested to reset your password(Link valid: ' + this.config.MailLinkValid + ' hours)<br><br>' +
-                '<a href=' + this.config.HostUrl + ':' + this.config.HostPort + '/Account/ResetPassword?code=' + code + '>Click here</a>'
+            html: `Hi! <br><br> If you requested to reset your password(Link valid: ${this.config.MailLinkValid} hours)<br><br>` +
+                `<a href=${this.config.HostUrl}:${this.config.HostPort}/Account/ResetPassword?code=${code}&email=${email}>Click here</a>`
         };
         return await transporter.sendMail(mailOptions);
     }
