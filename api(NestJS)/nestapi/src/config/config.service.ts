@@ -135,7 +135,7 @@ export class ConfigService {
   }
 
   get  TaskInterval(): number {
-    return this.envConfig.TASK_INTERVAL;
+    return this.envConfig.TASK_INTERVAL_IN_MINUTES;
   }
   
 }
