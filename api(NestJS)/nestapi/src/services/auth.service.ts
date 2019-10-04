@@ -38,7 +38,7 @@ export class AuthService {
         if (user.password !== this.hashPassword(userDto.password)) {
             throw new UnauthorizedException('Invalid password attempt!');
         }
-        this.logger.info(`User: ${user} was login`);
+        this.logger.info(`User: ${user.email} was login`);
         return this.getAuthToken(user);
     }
 

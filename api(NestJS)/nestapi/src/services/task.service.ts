@@ -14,6 +14,5 @@ export class TaskService extends NestSchedule {
     @Interval(config.TaskInterval * 1000 * 60)
     async deleteTokenTask() {
         await this.tokenService.deleteByExpires(config.MailLinkValid * 1000 * 3600);
-        return false;
     }
 }

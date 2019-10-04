@@ -5,6 +5,7 @@ import { PhotoModule } from './modules/photo.module';
 import { ConfigModule } from './config/config.module';
 import { ScheduleModule } from 'nest-schedule';
 import { LoggerModule } from './modules/logger.module';
+import { TaskModule } from './modules/task.module';
 
 @Module({
   imports: [AccountModule,
@@ -12,7 +13,8 @@ import { LoggerModule } from './modules/logger.module';
     ScheduleModule.register(),
     PhotoModule,
     ConfigModule,
-    LoggerModule],
+    LoggerModule,
+    TaskModule],
   controllers: [],
   providers: [],
 })

@@ -9,7 +9,6 @@ import { JwtStrategy } from 'src/strategy/jwt.strategy';
 import { ConfigModule } from 'src/config/config.module';
 import { User } from 'src/models/entity/user.entity';
 import { ConfigService } from 'src/config/config.service';
-import { TaskService } from '../services/task.service'
 import { TokenReset } from 'src/models/entity/tokenreset.entity';
 import { TokenResetService } from 'src/services/tokenreset.service';
 import { LoggerModule } from './logger.module';
@@ -23,6 +22,6 @@ const config = new ConfigService();
     signOptions: { expiresIn: config.JwtInspires }
   }), HttpModule, PassportModule, ConfigModule, LoggerModule ],
   controllers: [AccountController],
-  providers: [ UserService, AuthService, TaskService, TokenResetService, JwtStrategy ],
+  providers: [ UserService, AuthService, TokenResetService, JwtStrategy ],
 })
 export class AccountModule { }
