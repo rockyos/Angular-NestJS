@@ -12,6 +12,7 @@ import { ConfigService } from 'src/config/config.service';
 import { TaskService } from '../services/task.service'
 import { TokenReset } from 'src/models/entity/tokenreset.entity';
 import { TokenResetService } from 'src/services/tokenreset.service';
+import { LoggerModule } from './logger.module';
 
 const config = new ConfigService();
 
@@ -20,7 +21,7 @@ const config = new ConfigService();
   JwtModule.register({
     secret: config.JwtSecretKey,
     signOptions: { expiresIn: config.JwtInspires }
-  }), HttpModule, PassportModule, ConfigModule ],
+  }), HttpModule, PassportModule, ConfigModule, LoggerModule ],
   controllers: [AccountController],
   providers: [ UserService, AuthService, TaskService, TokenResetService, JwtStrategy ],
 })

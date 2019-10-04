@@ -38,104 +38,119 @@ export class ConfigService {
     return this.envConfig.DB_HOST;
   }
 
-  get  DatabasePort(): number {
+  get DatabasePort(): number {
     return this.envConfig.DB_PORT;
   }
 
-  get  DatabaseUserName(): string {
+  get DatabaseUserName(): string {
     return this.envConfig.DB_USERNAME;
   }
 
-  get  DatabasePass(): string {
+  get DatabasePass(): string {
     return this.envConfig.DB_PASSWORD;
   }
 
-  get  DatabaseDbName(): string {
+  get DatabaseDbName(): string {
     return this.envConfig.DB_DATABASE;
   }
 
-  get  DatabaseEntities(): string {
+  get DatabaseEntities(): string {
     return this.envConfig.DB_ENTITIES;
   }
 
-  get  DatabaseMigrations(): string {
+  get DatabaseMigrations(): string {
     return this.envConfig.DB_MIGRATION;
   }
 
-  get  DatabaseMigrationsTable(): string {
+  get DatabaseMigrationsTable(): string {
     return this.envConfig.DB_MIGRAT_TABLE;
   }
 
-  get  DatabaseMigrationsRun(): boolean {
+  get DatabaseMigrationsRun(): boolean {
     return this.envConfig.DB_MIGRAT_RUN;
   }
 
-  get  DatabaseSynchronize(): boolean {
+  get DatabaseSynchronize(): boolean {
     return this.envConfig.DB_SYNCHRONIZE;
   }
 
-  get  DatabaseMigrationsDir(): string {
+  get DatabaseMigrationsDir(): string {
     return this.envConfig.DB_MIGRATIONDIR;
   }
 
-  get  HostUrl(): string {
+  get HostUrl(): string {
     return this.envConfig.HOST_URL;
   }
 
-  get  HostPort(): number {
+  get HostPort(): number {
     return this.envConfig.HOST_PORT;
   }
 
-  get  MailHost(): string {
+  get MailHost(): string {
     return this.envConfig.MAIL_HOST;
   }
 
-  get  MailPort(): number {
+  get MailPort(): number {
     return this.envConfig.MAIL_PORT;
   }
 
-  get  MailSecure(): boolean {
+  get MailSecure(): boolean {
     return this.envConfig.MAIL_SECURE;
   }
 
-  get  MailUser(): string {
+  get MailUser(): string {
     return this.envConfig.MAIL_USER;
   }
 
-  get  MailPass(): string {
+  get MailPass(): string {
     return this.envConfig.MAIL_PASSWORD;
   }
 
-  get  MailLinkValid(): number {
+  get MailLinkValid(): number {
     return this.envConfig.LINK_VALID_IN_HOURS;
   }
 
-  get  SessionKey(): string {
+  get SessionKey(): string {
     return this.envConfig.SESSION_KEY;
   }
 
-  get SessionSecret(): string{
+  get SessionSecret(): string {
     return this.envConfig.SESSION_SECRET;
   }
 
-  get SessionReSave(): boolean{
+  get SessionReSave(): boolean {
     return this.envConfig.SESSION_RESAVE;
   }
 
-  get SessionSaveUnitialized(): boolean{
+  get SessionSaveUnitialized(): boolean {
     return this.envConfig.SESSION_SAVEUNITILIZED;
   }
-  
-  get  JwtSecretKey(): string {
+
+  get JwtSecretKey(): string {
     return this.envConfig.JWT_SECRET_KEY;
   }
 
-  get  JwtInspires(): string {
+  get JwtInspires(): string {
     return this.envConfig.JWT_EXPIRES;
   }
 
-  get  TaskInterval(): number {
+  get TaskInterval(): number {
     return this.envConfig.TASK_INTERVAL_IN_MINUTES;
   }
-  
+
+  get logLevel(): string {
+    return this.envConfig.LOGGER_LEVEL;
+  }
+
+  get serviceName(): string {
+    return this.envConfig.LOGGER_SERVICENAME;
+  }
+
+  get logAppenders(): any {
+    return this.envConfig.LOGGER_APPENDERS;
+  }
+
+  get logFilePath(): string {
+    return this.envConfig.LOGGER_FILEPATH;
+  }
 }

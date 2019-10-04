@@ -4,11 +4,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { Photo } from 'src/models/entity/photo.entity';
 import { PhotoDto } from 'src/models/dto/photoDto';
 import { MainPhotoService } from 'src/services/mainphoto.service';
+import { LoggerService } from 'nest-logger';
 
 @Controller('api/photo')
 //@UseInterceptors(CacheInterceptor)
 export class PhotoController {
-     constructor(private readonly mainPhotoService: MainPhotoService) { }
+     constructor(private readonly mainPhotoService: MainPhotoService, private readonly logger: LoggerService) { }
 
      @UseGuards(AuthGuard('jwt'))
      @Get()
@@ -28,6 +29,7 @@ export class PhotoController {
      @Post('send')
      @UseInterceptors(FileInterceptor('file'))
      async uploadPhoto(@UploadedFile() file: Photo, @Session() session: Photo[]): Promise<any> {
+          this.logger.info(`File ${file.originalname} was received`);
           return await this.mainPhotoService.addPhotoToSession(file, session);
      }
 

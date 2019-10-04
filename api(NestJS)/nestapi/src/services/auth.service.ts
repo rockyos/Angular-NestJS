@@ -11,6 +11,7 @@ import { ResetPassDto } from 'src/models/dto/resetpassDto';
 import { ConfigService } from 'src/config/config.service';
 import { TokenResetService } from './tokenreset.service';
 import { TokenReset } from 'src/models/entity/tokenreset.entity';
+import { LoggerService } from 'nest-logger';
 
 
 
@@ -21,7 +22,8 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly tokenService: TokenResetService,
         private readonly httpService: HttpService,
-        private readonly config: ConfigService
+        private readonly config: ConfigService,
+        private readonly logger: LoggerService
     ) {  }
 
     private async validate(userData: UserDto): Promise<User> {
@@ -36,6 +38,7 @@ export class AuthService {
         if (user.password !== this.hashPassword(userDto.password)) {
             throw new UnauthorizedException('Invalid password attempt!');
         }
+        this.logger.info(`User: ${user} was login`);
         return this.getAuthToken(user);
     }
 
