@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { User } from "./user.entity";
 
 @Entity()
 export class Photo{
@@ -13,6 +14,9 @@ export class Photo{
 
     @Column("bytea")
     buffer: Buffer;
+
+    @ManyToOne(type => User, user => user.photos)
+    user: User;
 
     constructor(guid: string, originalname: string,  buffer: Buffer) {
         this.guid = guid;

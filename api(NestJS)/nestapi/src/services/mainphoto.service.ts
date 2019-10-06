@@ -5,13 +5,15 @@ import { Photo } from "src/models/entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
 import { ConfigService } from "src/config/config.service";
+import { UserService } from "./user.service";
 const sharp = require("sharp");
 
 @Injectable()
 export class MainPhotoService {
     constructor(
         private readonly photoService: PhotoService,
-       private readonly config: ConfigService
+        private readonly userService: UserService,
+        private readonly config: ConfigService
     ) { }
 
 
@@ -86,7 +88,7 @@ export class MainPhotoService {
         }
     }
 
-    public async savePhoto(session: Photo[]): Promise<any> {
+    public async savePhoto(session: Photo[], username: string): Promise<any> {
         let photoInSession: Photo[] = session[this.config.SessionKey];
         if (photoInSession) {
             for (var photoItem of photoInSession) {
@@ -96,6 +98,8 @@ export class MainPhotoService {
                 } else {
                     var array = Buffer.from(photoItem.buffer)
                     photoItem.buffer = array;
+                    const user = await this.userService.findByEmail(username);
+                    photoItem.user = user; 
                     await this.photoService.addPhoto(photoItem);
                 }
             }

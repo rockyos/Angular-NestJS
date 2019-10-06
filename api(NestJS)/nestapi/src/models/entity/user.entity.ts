@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToMany } from 'typeorm';
 import * as crypto from 'crypto';
+import { Photo } from './photo.entity';
 
 @Entity()
 export class User {
@@ -18,4 +19,7 @@ export class User {
 
   @Column()
   createDate: Date;
+
+  @OneToMany(type => Photo, photo => photo.user)
+  photos: Photo[];
 }
