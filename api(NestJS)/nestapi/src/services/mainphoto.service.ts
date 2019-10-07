@@ -4,7 +4,6 @@ import { PhotoDto } from "src/models/dto/photoDto";
 import { Photo } from "src/models/entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
-import { ConfigService } from "src/config/config.service";
 import { UserService } from "./user.service";
 const sharp = require("sharp");
 
@@ -13,12 +12,11 @@ export class MainPhotoService {
     constructor(
         private readonly photoService: PhotoService,
         private readonly userService: UserService,
-        private readonly config: ConfigService
     ) { }
 
 
     public async getPhotoAll(session: Photo[], username: string): Promise<PhotoDto[]> {
-        let photosInSession: Photo[] = session[this.config.SessionKey];
+        let photosInSession: Photo[] = session[username];
         const user = await this.userService.findByEmail(username);
         let photosInDb = await this.photoService.findAllByUser(user);
         if (photosInSession) {
@@ -44,10 +42,10 @@ export class MainPhotoService {
         return photoDto;
     }
 
-    public async getImage(session: Photo[], id: string, width: string): Promise<any> {
+    public async getImage(session: Photo[], id: string, width: string, username: string): Promise<any> {
         let photoInDb = await this.photoService.findOneByGuid(id);
         if (!photoInDb) {
-            let photoInSession: Photo[] = session[this.config.SessionKey];
+            let photoInSession: Photo[] = session[username];
             for (var photoItem of photoInSession) {
                 if (photoItem.guid === id) {
                     photoInDb = photoItem;
@@ -77,20 +75,20 @@ export class MainPhotoService {
         return new Photo(guid, file.originalname, file.buffer);
     }
 
-    public async addPhotoToSession(photo: Photo, session: Photo[]): Promise<any> {
-        let photoInSession: Photo[] = session[this.config.SessionKey];
+    public async addPhotoToSession(photo: Photo, session: Photo[], username: string): Promise<any> {
+        let photoInSession: Photo[] = session[username];
         if (photoInSession) {
             photoInSession.push(this.upLoadFileToPhoto(photo));
-            session[this.config.SessionKey] = photoInSession;
+            session[username] = photoInSession;
         } else {
             let photoInSession: Photo[] = [];
             photoInSession.push(this.upLoadFileToPhoto(photo));
-            session[this.config.SessionKey] = photoInSession;
+            session[username] = photoInSession;
         }
     }
 
     public async savePhoto(session: Photo[], username: string): Promise<any> {
-        let photoInSession: Photo[] = session[this.config.SessionKey];
+        let photoInSession: Photo[] = session[username];
         if (photoInSession) {
             for (var photoItem of photoInSession) {
                 let photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
@@ -107,27 +105,27 @@ export class MainPhotoService {
         }
     }
 
-    public async deletePhoto(session: Photo[], id: string): Promise<any> {
-        let photoInSession: Photo[] = session[this.config.SessionKey];
+    public async deletePhoto(session: Photo[], id: string, username: string): Promise<any> {
+        let photoInSession: Photo[] = session[username];
         const photoInDb = await this.photoService.findOneByGuid(id);
         if (photoInDb) {
-            photoInSession = session[this.config.SessionKey];
+            photoInSession = session[username];
             if (!photoInSession) {
                 photoInSession = [];
             }
             photoInSession.push(photoInDb);
-            session[this.config.SessionKey] = photoInSession;
+            session[username] = photoInSession;
         } else {
             for(var photoItem of photoInSession){
                 if (photoItem.guid === id) {
                     const index = photoInSession.indexOf(photoItem);
-                    session[this.config.SessionKey].splice(index);
+                    session[username].splice(index);
                 }
             }
         }
     }
 
-    public async resetPhoto(session: Photo[]): Promise<any> {
-        session[this.config.SessionKey] = undefined;
+    public async resetPhoto(session: Photo[], username: string): Promise<any> {
+        session[username] = undefined;
     }
 }

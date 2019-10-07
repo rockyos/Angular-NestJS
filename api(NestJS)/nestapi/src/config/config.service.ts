@@ -110,10 +110,6 @@ export class ConfigService {
     return this.envConfig.LINK_VALID_IN_HOURS;
   }
 
-  get SessionKey(): string {
-    return this.envConfig.SESSION_KEY;
-  }
-
   get SessionSecret(): string {
     return this.envConfig.SESSION_SECRET;
   }

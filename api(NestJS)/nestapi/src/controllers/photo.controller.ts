@@ -20,18 +20,20 @@ export class PhotoController {
 
      @UseGuards(AuthGuard('jwt'))
      @Get(':id')
-     async getOnePhotoAsync(@Session() session: Photo[], @Param('id') id, @Query() query, @Res() res): Promise<any> {
+     async getOnePhotoAsync(@Session() session: Photo[], @Param('id') id, @Query() query, @Res() res, @Req() request): Promise<any> {
           const photoWidth = query['width'];
-          const stream = await this.mainPhotoService.getImage(session, id, photoWidth);
+          const username = request.user.username;
+          const stream = await this.mainPhotoService.getImage(session, id, photoWidth, username);
           return stream.pipe(res);
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Post('send')
      @UseInterceptors(FileInterceptor('file'))
-     async uploadPhoto(@UploadedFile() file: Photo, @Session() session: Photo[]): Promise<any> {
+     async uploadPhoto(@UploadedFile() file: Photo, @Session() session: Photo[], @Req() request): Promise<any> {
           this.logger.info(`File ${file.originalname} was received`);
-          return await this.mainPhotoService.addPhotoToSession(file, session);
+          const username = request.user.username;
+          return await this.mainPhotoService.addPhotoToSession(file, session, username);
      }
 
      @UseGuards(AuthGuard('jwt'))
@@ -39,18 +41,20 @@ export class PhotoController {
      async savePhoto(@Session() session: Photo[], @Req() request): Promise<any> {
           const username = request.user.username;
           await this.mainPhotoService.savePhoto(session, username);
-          await this.mainPhotoService.resetPhoto(session);
+          await this.mainPhotoService.resetPhoto(session, username);
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Delete(':id')
-     async deletePhoto(@Param('id') id, @Session() session: Photo[]): Promise<any> {
-          return await this.mainPhotoService.deletePhoto(session, id);
+     async deletePhoto(@Param('id') id, @Session() session: Photo[], @Req() request): Promise<any> {
+          const username = request.user.username;
+          return await this.mainPhotoService.deletePhoto(session, id, username);
      }
 
      @UseGuards(AuthGuard('jwt'))
      @Post('reset')
-     async resetPhoto(@Session() session: Photo[]): Promise<any> {
-          await this.mainPhotoService.resetPhoto(session);
+     async resetPhoto(@Session() session: Photo[], @Req() request): Promise<any> {
+          const username = request.user.username;
+          await this.mainPhotoService.resetPhoto(session, username);
      }
 }
