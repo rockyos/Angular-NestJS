@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Photo } from 'src/models/entity/photo.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/models/entity/user.entity';
 
 @Injectable()
 export class PhotoService {
@@ -10,8 +11,12 @@ export class PhotoService {
         private photoRepository: Repository<Photo>,
     ) { }
 
-    async findAll(): Promise<Photo[]> {
-        return await this.photoRepository.find();
+    async findAllByUser(user: User): Promise<Photo[]> {
+        return await this.photoRepository.find({
+            where:{
+                user: user,
+            }
+        });
     }
 
     async addPhoto(photo: Photo): Promise<Photo>{

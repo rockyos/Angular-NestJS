@@ -15,7 +15,7 @@ export class PhotoController {
      @Get()
      async getPhotoAsync(@Session() session: Photo[], @Req() request): Promise<PhotoDto[]> {
           const username = request.user.username;
-          return await this.mainPhotoService.getPhotoAll(session);
+          return await this.mainPhotoService.getPhotoAll(session, username);
      }
 
      @UseGuards(AuthGuard('jwt'))

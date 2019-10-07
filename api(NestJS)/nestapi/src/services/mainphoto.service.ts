@@ -17,9 +17,10 @@ export class MainPhotoService {
     ) { }
 
 
-    public async getPhotoAll(session: Photo[]): Promise<PhotoDto[]> {
+    public async getPhotoAll(session: Photo[], username: string): Promise<PhotoDto[]> {
         let photosInSession: Photo[] = session[this.config.SessionKey];
-        let photosInDb = await this.photoService.findAll();
+        const user = await this.userService.findByEmail(username);
+        let photosInDb = await this.photoService.findAllByUser(user);
         if (photosInSession) {
             let hidePhotoFromSession: Photo[] = [];
             for(var photoItem of photosInSession){
