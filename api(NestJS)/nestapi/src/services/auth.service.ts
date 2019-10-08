@@ -78,6 +78,7 @@ export class AuthService {
         newToken.email = email;
         newToken.createDate = tokenCreateDate;
         newToken.token = token;
+        newToken.user = user;
         let createdToken =  await this.tokenService.create(newToken);
         const code = createdToken.token;
         let transporter = nodemailer.createTransport({
@@ -111,7 +112,8 @@ export class AuthService {
            updateUser.password = this.hashPassword(resetPass.password);
            const updatedUser = await this.userService.createOrUpdate(updateUser);
            if(updatedUser){
-               await this.tokenService.deleteByToken(token);
+               await this.tokenService.deleteByToken(token);// delete only used token
+              // await this.tokenService.deleteByUser(user); // delete all tokens related to user
            }
            return;
         }

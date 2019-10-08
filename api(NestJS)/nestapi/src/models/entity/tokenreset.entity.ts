@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, ManyToOne } from 'typeorm';
 import * as crypto from 'crypto';
+import { User } from './user.entity';
 
 @Entity()
 export class TokenReset {
@@ -18,4 +19,7 @@ export class TokenReset {
 
   @Column()
   createDate: Date;
+
+  @ManyToOne(type => User, user => user.tokensreset)
+  user: User;
 }
