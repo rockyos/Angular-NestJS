@@ -23,7 +23,7 @@ export class MainPhotoService {
         let photosInDb = await this.photoService.findAllByUser(user);
         if (photosInSession) {
             let hidePhotoFromSession: Photo[] = [];
-            for(var photoItem of photosInSession){
+            for (var photoItem of photosInSession) {
                 const photo = photosInDb.filter((item) => item.guid == photoItem.guid);
                 const index = photosInDb.indexOf(photo[0]);
                 if (index != -1) {
@@ -37,10 +37,10 @@ export class MainPhotoService {
             });
         }
         let photoDto: PhotoDto[] = [];
-        for(var photoItem of photosInDb){
+        for (var photoItem of photosInDb) {
             var newPhotoDto = new PhotoDto(photoItem.id, photoItem.guid, photoItem.originalname);
             photoDto.push(newPhotoDto);
-        }      
+        }
         return photoDto;
     }
 
@@ -91,7 +91,7 @@ export class MainPhotoService {
                     var array = Buffer.from(photoItem.buffer)
                     photoItem.buffer = array;
                     const user = await this.userService.findByEmail(username);
-                    photoItem.user = user; 
+                    photoItem.user = user;
                     await this.photoService.addPhoto(photoItem);
                 }
             }
@@ -110,7 +110,7 @@ export class MainPhotoService {
             photoInSession.push(photoInDb);
             session[username] = photoInSession;
         } else {
-            for(var photoItem of photoInSession){
+            for (var photoItem of photoInSession) {
                 if (photoItem.guid === id) {
                     const index = photoInSession.indexOf(photoItem);
                     session[username].splice(index);
@@ -136,7 +136,7 @@ export class MainPhotoService {
         return new Photo(guid, file.originalname, file.buffer);
     }
 
-    private getUserFromToken(authHeader: string): string{
+    private getUserFromToken(authHeader: string): string {
         const headerArray = authHeader.split(' ');
         const token = headerArray[1];
         const decodeInfo = this.jwtService.decode(token);

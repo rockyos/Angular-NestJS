@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TaskService } from 'src/services/task.service';
-import { TokenResetService } from 'src/services/tokenreset.service';
+import { TokenService } from 'src/services/token.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TokenReset } from 'src/models/entity/tokenreset.entity';
+import { Token } from 'src/models/entity/token.entity';
 import { ConfigModule } from 'src/config/config.module';
 
 @Module({
-    imports:[TypeOrmModule.forFeature([TokenReset]), ConfigModule],
-    providers: [TaskService, TokenResetService]
+    imports:[TypeOrmModule.forFeature([Token]), ConfigModule],
+    providers: [TaskService, TokenService]
 })
 export class TaskModule {}

@@ -9,8 +9,8 @@ import { UserDto } from 'src/models/dto/userDto';
 var nodemailer = require('nodemailer');
 import { ResetPassDto } from 'src/models/dto/resetpassDto';
 import { ConfigService } from 'src/config/config.service';
-import { TokenResetService } from './tokenreset.service';
-import { TokenReset } from 'src/models/entity/tokenreset.entity';
+import { TokenService } from './token.service';
+import { Token } from 'src/models/entity/token.entity';
 import { LoggerService } from 'nest-logger';
 
 
@@ -20,7 +20,7 @@ export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
-        private readonly tokenService: TokenResetService,
+        private readonly tokenService: TokenService,
         private readonly httpService: HttpService,
         private readonly config: ConfigService,
         private readonly logger: LoggerService
@@ -74,7 +74,7 @@ export class AuthService {
         }
         const tokenCreateDate = new Date();
         const token =  email + tokenCreateDate.getTime();
-        let newToken = new TokenReset();
+        let newToken = new Token();
         newToken.email = email;
         newToken.createDate = tokenCreateDate;
         newToken.token = token;

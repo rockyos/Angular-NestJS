@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from 'src/config/config.service';
 import { NestSchedule, Interval } from 'nest-schedule';
-import { TokenResetService } from './tokenreset.service';
+import { TokenService } from './token.service';
 const config = new ConfigService();
 
 @Injectable()
 export class TaskService extends NestSchedule {
     constructor(
-        private readonly tokenService: TokenResetService
+        private readonly tokenService: TokenService
     ) { super()}
     
 

@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TokenReset } from '../models/entity/tokenreset.entity';
+import { Token } from '../models/entity/token.entity';
 import { Repository, LessThan } from 'typeorm';
 import { User } from 'src/models/entity/user.entity';
 
 @Injectable()
-export class TokenResetService {
+export class TokenService {
     constructor(
-        @InjectRepository(TokenReset)
-        private tokenRepository: Repository<TokenReset>,
+        @InjectRepository(Token)
+        private tokenRepository: Repository<Token>,
     ) { }
 
-    async findByToken(token: string): Promise<TokenReset> {
+    async findByToken(token: string): Promise<Token> {
         return await this.tokenRepository.findOne({
             where: {
                 token: token,
@@ -29,7 +29,7 @@ export class TokenResetService {
         return await this.tokenRepository.remove(expires);
     }
 
-    async deleteByToken(resetToken: TokenReset): Promise<any>{
+    async deleteByToken(resetToken: Token): Promise<any>{
         return await this.tokenRepository.remove(resetToken);
     }
 
@@ -42,7 +42,7 @@ export class TokenResetService {
         return await this.tokenRepository.remove(tokens);
     }
 
-    async create(resetToken: TokenReset): Promise<TokenReset> {
+    async create(resetToken: Token): Promise<Token> {
         return await this.tokenRepository.save(resetToken);
     }
 }
