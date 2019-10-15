@@ -5,7 +5,7 @@ import { Photo } from "src/models/entity/photo.entity";
 import { Guid } from "guid-typescript";
 import { Readable } from "stream";
 import { UserService } from "./user.service";
-import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "src/config/config.service";
 const sharp = require("sharp");
 
 @Injectable()
@@ -13,12 +13,11 @@ export class MainPhotoService {
     constructor(
         private readonly photoService: PhotoService,
         private readonly userService: UserService,
-        private readonly jwtService: JwtService
+        private readonly config: ConfigService
     ) { }
 
-    public async getPhotoAll(session: Photo[], authHeader: string): Promise<PhotoDto[]> {
-        const username = this.getUserFromToken(authHeader);
-        let photosInSession: Photo[] = session[username];
+    public async getPhotoAll(session: Photo[], username: string): Promise<PhotoDto[]> {
+        let photosInSession: Photo[] = session[this.config.SessionKey];
         const user = await this.userService.findByEmail(username);
         let photosInDb = await this.photoService.findAllByUser(user);
         if (photosInSession) {
@@ -44,11 +43,10 @@ export class MainPhotoService {
         return photoDto;
     }
 
-    public async getImage(session: Photo[], id: string, width: string, authHeader: string): Promise<any> {
-        const username = this.getUserFromToken(authHeader);
+    public async getImage(session: Photo[], id: string, width: string): Promise<any> {
         let photoInDb = await this.photoService.findOneByGuid(id);
         if (!photoInDb) {
-            let photoInSession: Photo[] = session[username];
+            let photoInSession: Photo[] = session[this.config.SessionKey];
             for (var photoItem of photoInSession) {
                 if (photoItem.guid === id) {
                     photoInDb = photoItem;
@@ -66,22 +64,20 @@ export class MainPhotoService {
         return this.getReadableStream(photoInDb.buffer);
     }
 
-    public async addPhotoToSession(photo: Photo, session: Photo[], authHeader: string): Promise<any> {
-        const username = this.getUserFromToken(authHeader);
-        let photoInSession: Photo[] = session[username];
+    public async addPhotoToSession(photo: Photo, session: Photo[]): Promise<any> {
+        let photoInSession: Photo[] = session[this.config.SessionKey];
         if (photoInSession) {
             photoInSession.push(this.upLoadFileToPhoto(photo));
-            session[username] = photoInSession;
+            session[this.config.SessionKey] = photoInSession;
         } else {
             let photoInSession: Photo[] = [];
             photoInSession.push(this.upLoadFileToPhoto(photo));
-            session[username] = photoInSession;
+            session[this.config.SessionKey] = photoInSession;
         }
     }
 
-    public async savePhoto(session: Photo[], authHeader: string): Promise<any> {
-        const username = this.getUserFromToken(authHeader);
-        let photoInSession: Photo[] = session[username];
+    public async savePhoto(session: Photo[], username: string): Promise<any> {
+        let photoInSession: Photo[] = session[this.config.SessionKey];
         if (photoInSession) {
             for (var photoItem of photoInSession) {
                 let photoInDb = await this.photoService.findOneByGuid(photoItem.guid);
@@ -98,30 +94,28 @@ export class MainPhotoService {
         }
     }
 
-    public async deletePhoto(session: Photo[], id: string, authHeader: string): Promise<any> {
-        const username = this.getUserFromToken(authHeader);
-        let photoInSession: Photo[] = session[username];
+    public async deletePhoto(session: Photo[], id: string): Promise<any> {
+        let photoInSession: Photo[] = session[this.config.SessionKey];
         const photoInDb = await this.photoService.findOneByGuid(id);
         if (photoInDb) {
-            photoInSession = session[username];
+            photoInSession = session[this.config.SessionKey]; ////////////////////////////////////////////
             if (!photoInSession) {
                 photoInSession = [];
             }
             photoInSession.push(photoInDb);
-            session[username] = photoInSession;
+            session[this.config.SessionKey] = photoInSession;
         } else {
             for (var photoItem of photoInSession) {
                 if (photoItem.guid === id) {
                     const index = photoInSession.indexOf(photoItem);
-                    session[username].splice(index);
+                    session[this.config.SessionKey].splice(index);
                 }
             }
         }
     }
 
-    public async resetPhoto(session: Photo[], authHeader: string): Promise<any> {
-        const username = this.getUserFromToken(authHeader);
-        session[username] = undefined;
+    public async resetPhoto(session: Photo[]): Promise<any> {
+        session[this.config.SessionKey] = undefined;
     }
 
     private getReadableStream(buffer: Buffer): Readable {
@@ -134,12 +128,5 @@ export class MainPhotoService {
     private upLoadFileToPhoto(file: Photo) {
         var guid = Guid.create().toString();
         return new Photo(guid, file.originalname, file.buffer);
-    }
-
-    private getUserFromToken(authHeader: string): string {
-        const headerArray = authHeader.split(' ');
-        const token = headerArray[1];
-        const decodeInfo = this.jwtService.decode(token);
-        return decodeInfo['username'];
     }
 }
