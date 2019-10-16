@@ -1,13 +1,14 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import * as jwt_decode from 'jwt-decode';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenService {
 
-  constructor(private router: Router, private ngZone: NgZone) { }
+  constructor(private router: Router, private ngZone: NgZone, private cookie: CookieService) { }
 
   tokenKey: string = 'jwt';
   localStorage: boolean = false;
@@ -43,6 +44,7 @@ export class TokenService {
   }
 
   logOut() {
+    this.cookie.set('connect.sid', 'ClearSessionCookie', 1);
     sessionStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.tokenKey);
     this.router.navigate(['Account/Login']);

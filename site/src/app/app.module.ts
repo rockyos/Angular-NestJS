@@ -24,6 +24,7 @@ import { ImagePipe } from './image.pipe';
 import { SafePipe } from './safe.pipe';
 import { RegisterExternalComponent } from './register-external/register-external.component';
 import { Angular2SocialLoginModule } from 'angular2-social-login';
+import { CookieService } from 'ngx-cookie-service';
 
 let providers = {
   "google": {
@@ -60,7 +61,7 @@ let providers = {
     ReactiveFormsModule,
     Angular2SocialLoginModule
   ],
-  providers: [HttpService, AuthGuard, TokenService, {provide: HTTP_INTERCEPTORS, useClass: HttpConfigInterceptor, multi: true}],
+  providers: [HttpService, AuthGuard, TokenService, CookieService, {provide: HTTP_INTERCEPTORS, useClass: HttpConfigInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
