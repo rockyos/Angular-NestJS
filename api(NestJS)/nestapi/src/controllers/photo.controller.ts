@@ -30,7 +30,7 @@ export class PhotoController {
      @Post('send')
      @UseInterceptors(FileInterceptor('file'))
      async uploadPhoto(@UploadedFile() file: Photo, @Session() session: Photo[]): Promise<any> {
-          this.logger.info(`File ${file.originalname} was received`);
+          this.logger.info(`File ${file.originalname} was received`, PhotoController.name);
           return await this.mainPhotoService.addPhotoToSession(file, session);
      }
 

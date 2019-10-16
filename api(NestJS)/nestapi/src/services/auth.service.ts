@@ -38,7 +38,7 @@ export class AuthService {
         if (user.password !== this.hashPassword(userDto.password)) {
             throw new UnauthorizedException('Invalid password attempt!');
         }
-        this.logger.info(`User: ${user.email} was login`);
+        this.logger.info(`User: ${user.email} was login`, AuthService.name);
         return this.getAuthToken(user);
     }
 
@@ -162,6 +162,7 @@ export class AuthService {
     }
 
     private getAuthToken(user: User) {
+        this.logger.info(`User: ${user.email} was login`, AuthService.name);
         const payload = { sub: user.id, username: user.email };
         const accessToken = this.jwtService.sign(payload);
         return { access_token: accessToken };
